@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="https://www.google.com/favicon.ico" />
+  <link rel="stylesheet" href="src/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Constraint Canvas</title>
+</head>
+
+<body>
+  <div style="display: flex; height: 100vh;">
+    <div id="canvas" style="flex: 7; background-color: #f0f0f0;"></div>
+    <div style="flex: 3; background: rgba(0, 0, 0, 0.5); padding: 10px;">
+      <button id="btn-draw-poly" class="btn-control">New Polygon</button>
+      
+      <ul id="list-polygons"></ul>
+      
+      Do not overlap:
+      <input type="text" id="input-not-overlap" placeholder="[[0, 1], [1, 2]]" class="input-relation" />
+      Overlap:
+      <input type="text" id="input-overlap" placeholder="[[0, 1], [1, 2]]" class="input-relation" />
+      Tangent:
+      <input type="text" id="input-tangent" placeholder="[[0, 1], [1, 2]]" class="input-relation" />
+      Contain ([a, b] for "a contains b"):
+      <input type="text" id="input-contain" placeholder="[[0, 1], [1, 2]]" class="input-relation" />
+
+      <button id="btn-process" class="btn-control">Process</button>
+      <button id="btn-debug" class="btn-control">Debug</button>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
