@@ -1,14 +1,23 @@
 import { Graphics, Application } from 'pixi.js';
 
 const cross = (a, b) => a[0] * b[1] - a[1] * b[0];
-
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
-
 const sqr = (x) => x * x;
-
 const vecAdd = (a, b) => [a[0] + b[0], a[1] + b[1]];
-
 const vecMinus = (a, b) => [a[0] - b[0], a[1] - b[1]];
+
+/**
+ * Symmetrically invert the points of a polygon about the origin
+ * @param {number[2][]} points Points of a polygon
+ * @returns {number[2][]} Resulting points
+ */
+const invertPoints = (points) => {
+    let inverted = [];
+    for (let i = 0; i < points.length; i++) {
+        inverted.push([-points[i][0], -points[i][1]]);
+    }
+    return inverted;
+};
 
 /**
  * Return whether a polygon's point set is in counter-clockwise order
@@ -25,9 +34,12 @@ const isCCW = (points) => {
     return sum > 0;
 };
 
-// Return whether a polygon is convex or not
-// TODO: AI Generated, not tested
-export function isConvex(points) {
+/**
+ * Return whether a polygon is convex.
+ * @param {number[2][]} points Points of the polygon.
+ * @returns {Boolean}
+ */
+function isConvex(points) {
     let isCCW = 0;
     let isCW = 0;
     const n = points.length;
@@ -85,20 +97,7 @@ function convexMinkowskiSum(pointsA, pointsB) {
     return ret;
 }
 
-/**
- * Symmetrically invert the points of a polygon about the origin
- * @param {number[2][]} points Points of a polygon
- * @returns {number[2][]} Resulting points
- */
-export const invertPoints = (points) => {
-    let inverted = [];
-    for (let i = 0; i < points.length; i++) {
-        inverted.push([-points[i][0], -points[i][1]]);
-    }
-    return inverted;
-};
-
-export const reducedConvolution = (pointsA, pointsB) => {
+const reducedConvolution = (pointsA, pointsB) => {
 
 }
 

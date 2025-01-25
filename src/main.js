@@ -6,6 +6,15 @@ let drawingPoly = false;
 let points = [];
 let lastPoly = null;
 
+function getRandomColor() {
+    const letters = "0123456789ABCDEF";
+    let color = "";
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
 function canvasDrawPolygonHandler(e) {
     points.push([e.offsetX, e.offsetY]);
     console.log(e.offsetX, e.offsetY);
@@ -27,8 +36,8 @@ function btnDrawPolyHandler() {
         let li = document.createElement('li');
         li.innerHTML = `Polygon ${polyManager.size()}`;
         polyList.append(li);
-        
-        const newPoly = new Polygon([...points], 'blue');
+
+        const newPoly = new Polygon([...points], getRandomColor());
         polyManager.pushPolygon(newPoly);
         app.stage.addChild(newPoly.getGraphics());
 
@@ -48,7 +57,7 @@ app.canvas.style.border = '1px solid black';
 document.querySelector('#canvas').append(app.canvas);
 
 // Create a polygon manager
-const polyManager = new polygonManager();
+const polyManager = new polygonManager(app);
 
 // Get control buttons' elements
 const drawPolyBtn = document.querySelector('#btn-draw-poly');
@@ -64,16 +73,17 @@ processBtn.addEventListener('click', async () => {
     // Get Content in the input boxes
     const notOverlap = eval(document.querySelector('#input-not-overlap').value) ?? [];
     const overlap = eval(document.querySelector('#input-overlap').value) ?? [];
-    const tangent = eval(document.querySelector('#input-tangent').value) ?? [];
+    const tangent = [];
     const contain = eval(document.querySelector('#input-contain').value) ?? [];
-    
+
     // Add relations to the polygon manager
     polyManager.setRelation(notOverlap, overlap, tangent, contain);
 
     // Start optimization process
-    await polyManager.optimize();
+    await polyManager.optimize(1e-3);
 });
 
 debugBtn.addEventListener('click', async () => {
-    await polyManager.optimize();
+    polyManager.polyList[0]._translatable = false;
+    console.log(polyManager);
 });

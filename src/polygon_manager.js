@@ -1,9 +1,9 @@
 import { Polygon } from "./polygon";
 import { optimize } from "./diff_func";
-import { not } from "rose";
 
 export class polygonManager {
-    constructor() {
+    constructor(app) {
+        this.app = app;
         this.polyList = [];
         this.drawingPoly = false;
         this.relation = { notOverlap: [], overlap: [], tangent: [], contain: [] };
@@ -45,6 +45,13 @@ export class polygonManager {
         }
     }
 
+    /**
+     * Set relation and stores them in the manager. A relation is a list of pairs of polygon indices.
+     * @param {number[2][]} notOverlap Relationships of not overlapping polygons
+     * @param {number[2][]} overlap Relationships of overlapping polygons.
+     * @param {number[2][]} tangent Relationships of tangenting polygons.
+     * @param {number[2][]} contain Relationships of B containing A.
+     */
     setRelation(notOverlap, overlap, tangent, contain) {
         this.relation.notOverlap = notOverlap;
         this.relation.overlap = overlap;
@@ -57,7 +64,7 @@ export class polygonManager {
      * @param {number} polyIndex Index of the inquired polygon.
      * @returns {number} Index of the inquiry.
      */
-    paramIndex(polyIndex) {
+    getParamIndex(polyIndex) {
         return polyIndex * this.paramSize;
     }
 
@@ -70,18 +77,22 @@ export class polygonManager {
         return this.totParameter;
     }
 
+    /**
+     * Return how many polygons the manager is holding.
+     * @returns {number}
+     */
     size() {
         return this.polyList.length;
     }
 
     applyTransformation() {
         for (let i = 0; i < this.polyList.length; i++) {
-            this.polyList[i].setOffset([this.param[this.paramIndex(i)], this.param[this.paramIndex(i) + 1]]);
+            this.polyList[i].setOffset([this.param[this.getParamIndex(i)], this.param[this.getParamIndex(i) + 1]]);
         }
     }
 
-    async optimize() {
-        this.param = await optimize(this);
+    async optimize(eta) {
+        this.param = await optimize(this, eta);
         this.applyTransformation();
     }
 }
