@@ -27,22 +27,22 @@ const isCCW = (points) => {
 
 // Return whether a polygon is convex or not
 // TODO: AI Generated, not tested
-function isConvex(poly) {
-    // let isCCW = 0;
-    // let isCW = 0;
-    // for (let i = 0; i < poly.n; i++) {
-    //     const [x1, y1] = poly.points[i];
-    //     const [x2, y2] = poly.points[(i + 1) % poly.n];
-    //     const [x3, y3] = poly.points[(i + 2) % poly.n];
-    //     const cross = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
-    //     if (cross > 0) {
-    //         isCCW++;
-    //     } else if (cross < 0) {
-    //         isCW++;
-    //     }
-    // }
-    // return isCCW === 0 || isCW === 0;
-    return true;
+export function isConvex(points) {
+    let isCCW = 0;
+    let isCW = 0;
+    const n = points.length;
+    for (let i = 0; i < n; i++) {
+        const [x1, y1] = points[i];
+        const [x2, y2] = points[(i + 1) % n];
+        const [x3, y3] = points[(i + 2) % n];
+        const cross = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
+        if (cross > 0) {
+            isCCW++;
+        } else if (cross < 0) {
+            isCW++;
+        }
+    }
+    return isCCW === 0 || isCW === 0;
 }
 
 /**
@@ -78,8 +78,8 @@ function convexMinkowskiSum(pointsA, pointsB) {
         let vecB = vecMinus(b[j + 1], b[j]);
         let crossProduct = cross(vecA, vecB);
         // Note that the y-axis in pixijs is inverted
-        if (crossProduct >= 0 && j < a.length - 2) j++;
-        if (crossProduct <= 0 && i < b.length - 2) i++;
+        if (crossProduct >= 0 && j < b.length - 2) j++;
+        if (crossProduct <= 0 && i < a.length - 2) i++;
     }
 
     return ret;
@@ -98,6 +98,10 @@ export const invertPoints = (points) => {
     return inverted;
 };
 
+export const reducedConvolution = (pointsA, pointsB) => {
+
+}
+
 export class Polygon {
     constructor(points, filling) {
         // Number of points of this polygon
@@ -115,7 +119,7 @@ export class Polygon {
         this._graphics.fill(filling);
 
         // Properties for whether allowed to transform
-        this._translatable = false;
+        this._translatable = true;
         this._scalable = false;
         this._rotatable = false;
 
@@ -135,6 +139,7 @@ export class Polygon {
         if (isConvex(pointsA) && isConvex(pointsB)) {
             return convexMinkowskiSum(pointsA, pointsB);
         }
+        throw new Error('Non-convex polygon is not supported yet.');
     }
 
     /**
@@ -230,5 +235,9 @@ export class Polygon {
 
     getGraphics() {
         return this._graphics;
+    }
+
+    getTranslatable() {
+        return this._translatable;
     }
 }
