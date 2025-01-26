@@ -68,7 +68,7 @@ function convexMinkowskiSum(pointsA, pointsB) {
         // Find the up-left-most point
         let pos = 0;
         for (let i = 1; i < points.length; i++) {
-            if (points[i][1] < points[pos][1] || (points[i][1] === points[pos][1] && points[i][0] < points[pos][0])) {
+            if (points[i][1] > points[pos][1] || (points[i][1] === points[pos][1] && points[i][0] < points[pos][0])) {
                 pos = i;
             }
         }
@@ -84,21 +84,17 @@ function convexMinkowskiSum(pointsA, pointsB) {
     let i = 0;
     let j = 0;
 
-    while (i < a.length - 2 && j < b.length - 2) {
+    while (i < a.length - 2 || j < b.length - 2) {
         ret.push(vecAdd(a[i], b[j]));
         let vecA = vecMinus(a[i + 1], a[i]);
         let vecB = vecMinus(b[j + 1], b[j]);
         let crossProduct = cross(vecA, vecB);
         // Note that the y-axis in pixijs is inverted
-        if (crossProduct >= 0 && j < b.length - 2) j++;
         if (crossProduct <= 0 && i < a.length - 2) i++;
+        if (crossProduct >= 0 && j < b.length - 2) j++;
     }
 
     return ret;
-}
-
-const reducedConvolution = (pointsA, pointsB) => {
-
 }
 
 export class Polygon {
