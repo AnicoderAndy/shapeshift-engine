@@ -95,7 +95,8 @@ function convexMinkowskiSum(pointsA, pointsB) {
     return ret;
 }
 
-export function reducedConvolution(pointsA, pointsB, app) {
+// Not used
+function reducedConvolution(pointsA, pointsB, app) {
     let ret = [];
     const n = pointsA.length;
     const m = pointsB.length;
@@ -137,6 +138,7 @@ export function reducedConvolution(pointsA, pointsB, app) {
     return ret;
 }
 
+// Not finished and not used
 function orientableLoops(edges) {
     let stack = edges.slice();  // MUST I NEED A SLICE HERE?
     let id = new Array(stack.length).fill(-1);

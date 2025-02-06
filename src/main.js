@@ -86,6 +86,4 @@ processBtn.addEventListener('click', async () => {
 debugBtn.addEventListener('click', async () => {
     polyManager.polyList[0]._translatable = false;
     console.log(polyManager);
-
-    // reducedConvolution(polyManager.polyList[0].getPoints(), polyManager.polyList[1].getPoints(), app);
 });
