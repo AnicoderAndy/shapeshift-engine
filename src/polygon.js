@@ -39,9 +39,8 @@ const isCCW = (points) => {
  * @param {number[2][]} points Points of the polygon.
  * @returns {Boolean}
  */
-function isConvex(points) {
+export function isConvex(points) {
     let isCCW = 0;
-    let isCW = 0;
     const n = points.length;
     for (let i = 0; i < n; i++) {
         const [x1, y1] = points[i];
@@ -50,11 +49,10 @@ function isConvex(points) {
         const cross = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
         if (cross > 0) {
             isCCW++;
-        } else if (cross < 0) {
-            isCW++;
+            break;
         }
     }
-    return isCCW === 0 || isCW === 0;
+    return isCCW === 0;
 }
 
 /**
@@ -95,6 +93,73 @@ function convexMinkowskiSum(pointsA, pointsB) {
     }
 
     return ret;
+}
+
+export function reducedConvolution(pointsA, pointsB, app) {
+    let ret = [];
+    const n = pointsA.length;
+    const m = pointsB.length;
+    const CCW = (a, b, c) => {
+        // return true;
+        return cross(b, a) <= 0 && cross(a, c) <= 0;
+    }
+
+    // Due to the process is symmetric, we can use the same function for twice
+    const process = (ptsA, n, ptsB, m) => {
+        for (let j = 0; j < m; j++) {
+            for (let i = 0; i < n; i++) {
+                const a = vecMinus(ptsA[(i + 1) % n], ptsA[i]);
+                const b = vecMinus(ptsB[j], ptsB[(j - 1 + m) % m]);
+                const c = vecMinus(ptsB[(j + 1) % m], ptsB[j]);
+                if (CCW(a, b, c)) {
+                    ret.push([vecAdd(ptsA[i], ptsB[j]), vecAdd(ptsA[(i + 1) % n], ptsB[j])]);
+                }
+            }
+        }
+    }
+    process(pointsA, n, pointsB, m);
+    process(pointsB, m, pointsA, n);
+
+    const drawLine = (x1, y1, x2, y2) => {
+        const tmp = new Graphics();
+        tmp.moveTo(x1, y1); tmp.lineTo(x2, y2);
+        tmp.stroke({ color: 'red', width: 2 });
+        app.stage.addChild(tmp);
+    }
+
+    for (let i = 0; i < ret.length; i++) {
+        drawLine(ret[i][0][0], ret[i][0][1], ret[i][1][0], ret[i][1][1]);
+    }
+
+    const mD = new Polygon(Polygon.minkowskiDiff(pointsA, pointsB), 'red');
+    app.stage.addChild(mD.getGraphics());
+
+    return ret;
+}
+
+function orientableLoops(edges) {
+    let stack = edges.slice();  // MUST I NEED A SLICE HERE?
+    let id = new Array(stack.length).fill(-1);
+    let currentId = 0;
+
+    const bestDirection = (edge) => { };
+    const recordLoop = (edge) => { };
+
+    while (stack.length) {
+        let e = stack.pop();
+        if (id[e] == -1) {
+            id[e] = currentId;
+            let ePrime = bestDirection(e);
+            while (ePrime != null && id[ePrime] == -1) {
+                id[ePrime] = currentId;
+                ePrime = bestDirection(ePrime);
+            }
+            if (id[ePrime] == currentId) {
+                recordLoop(ePrime);
+            }
+            currentId++;
+        }
+    }
 }
 
 export class Polygon {

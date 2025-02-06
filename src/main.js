@@ -1,4 +1,4 @@
-import { Application, Container, Sprite, Text, Texture, Assets, Graphics, GraphicsContext } from 'pixi.js';
+import { Application } from 'pixi.js';
 import { Polygon } from './polygon.js';
 import { polygonManager } from './polygon_manager.js';
 
@@ -86,4 +86,6 @@ processBtn.addEventListener('click', async () => {
 debugBtn.addEventListener('click', async () => {
     polyManager.polyList[0]._translatable = false;
     console.log(polyManager);
+
+    // reducedConvolution(polyManager.polyList[0].getPoints(), polyManager.polyList[1].getPoints(), app);
 });
