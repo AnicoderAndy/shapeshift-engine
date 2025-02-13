@@ -13,6 +13,7 @@
     "vite-plugin-top-level-await": "^1.4.4"
   },
   "dependencies": {
+    "clipper-lib": "^6.4.2",
     "pixi.js": "^8.6.6",
     "rose": "^0.4.10"
   }

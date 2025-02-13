@@ -1,10 +1,16 @@
-import { Graphics, Application } from 'pixi.js';
+import { Graphics } from 'pixi.js';
+import ClipperLib from 'clipper-lib';
 
 const cross = (a, b) => a[0] * b[1] - a[1] * b[0];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
 const sqr = (x) => x * x;
 const vecAdd = (a, b) => [a[0] + b[0], a[1] + b[1]];
 const vecMinus = (a, b) => [a[0] - b[0], a[1] - b[1]];
+
+const drawLine = (x1, y1, x2, y2, g, filling) => {
+    g.moveTo(x1, y1); g.lineTo(x2, y2);
+    g.stroke(filling);
+};
 
 /**
  * Symmetrically invert the points of a polygon about the origin
@@ -95,75 +101,6 @@ function convexMinkowskiSum(pointsA, pointsB) {
     return ret;
 }
 
-// Not used
-function reducedConvolution(pointsA, pointsB, app) {
-    let ret = [];
-    const n = pointsA.length;
-    const m = pointsB.length;
-    const CCW = (a, b, c) => {
-        // return true;
-        return cross(b, a) <= 0 && cross(a, c) <= 0;
-    }
-
-    // Due to the process is symmetric, we can use the same function for twice
-    const process = (ptsA, n, ptsB, m) => {
-        for (let j = 0; j < m; j++) {
-            for (let i = 0; i < n; i++) {
-                const a = vecMinus(ptsA[(i + 1) % n], ptsA[i]);
-                const b = vecMinus(ptsB[j], ptsB[(j - 1 + m) % m]);
-                const c = vecMinus(ptsB[(j + 1) % m], ptsB[j]);
-                if (CCW(a, b, c)) {
-                    ret.push([vecAdd(ptsA[i], ptsB[j]), vecAdd(ptsA[(i + 1) % n], ptsB[j])]);
-                }
-            }
-        }
-    }
-    process(pointsA, n, pointsB, m);
-    process(pointsB, m, pointsA, n);
-
-    const drawLine = (x1, y1, x2, y2) => {
-        const tmp = new Graphics();
-        tmp.moveTo(x1, y1); tmp.lineTo(x2, y2);
-        tmp.stroke({ color: 'red', width: 2 });
-        app.stage.addChild(tmp);
-    }
-
-    for (let i = 0; i < ret.length; i++) {
-        drawLine(ret[i][0][0], ret[i][0][1], ret[i][1][0], ret[i][1][1]);
-    }
-
-    const mD = new Polygon(Polygon.minkowskiDiff(pointsA, pointsB), 'red');
-    app.stage.addChild(mD.getGraphics());
-
-    return ret;
-}
-
-// Not finished and not used
-function orientableLoops(edges) {
-    let stack = edges.slice();  // MUST I NEED A SLICE HERE?
-    let id = new Array(stack.length).fill(-1);
-    let currentId = 0;
-
-    const bestDirection = (edge) => { };
-    const recordLoop = (edge) => { };
-
-    while (stack.length) {
-        let e = stack.pop();
-        if (id[e] == -1) {
-            id[e] = currentId;
-            let ePrime = bestDirection(e);
-            while (ePrime != null && id[ePrime] == -1) {
-                id[ePrime] = currentId;
-                ePrime = bestDirection(ePrime);
-            }
-            if (id[ePrime] == currentId) {
-                recordLoop(ePrime);
-            }
-            currentId++;
-        }
-    }
-}
-
 export class Polygon {
     constructor(points, filling) {
         // Number of points of this polygon
@@ -177,8 +114,13 @@ export class Polygon {
         }
         this._filling = filling;
         this._graphics = new Graphics();
-        this._graphics.poly([].concat(...this._points));
-        this._graphics.fill(filling);
+        if (this._n == 2) {
+            drawLine(points[0][0], points[0][1], points[1][0], points[1][1], this._graphics, filling);
+        }
+        else {
+            this._graphics.poly([].concat(...this._points));
+            this._graphics.fill(filling);
+        }
 
         // Properties for whether allowed to transform
         this._translatable = true;
@@ -201,7 +143,22 @@ export class Polygon {
         if (isConvex(pointsA) && isConvex(pointsB)) {
             return convexMinkowskiSum(pointsA, pointsB);
         }
-        throw new Error('Non-convex polygon is not supported yet.');
+        let pathA = [];
+        let pathB = [];
+        for (let i = 0; i < pointsA.length; i++) {
+            pathA.push({ X: pointsA[i][0], Y: pointsA[i][1] });
+        }
+        for (let i = 0; i < pointsB.length; i++) {
+            pathB.push({ X: pointsB[i][0], Y: pointsB[i][1] });
+        }
+        const result = ClipperLib.Clipper.MinkowskiSum(pathA, pathB, true)[0];
+        // console.log(result, ClipperLib.Clipper.MinkowskiSum(pathA, [...pathB].reverse(), true)[0]);
+        const ret = [];
+        for (let i = 0; i < result.length; i++) {
+            ret.push([result[i].X, result[i].Y]);
+        }
+        ret.reverse();
+        return ret;
     }
 
     /**
@@ -286,8 +243,13 @@ export class Polygon {
         this._offset = offset;
         this._graphics.clear();
         this._graphics.translateTransform(offset[0], offset[1]);
-        this._graphics.poly([].concat(...this._points));
-        this._graphics.fill(this._filling);
+        if (this._n == 2) {
+            drawLine(this._points[0][0], this._points[0][1], this._points[1][0], this._points[1][1], this._graphics, this._filling);
+        } else {
+            this._graphics.poly([].concat(...this._points));
+            this._graphics.fill(this._filling);
+        }
+
     }
 
     setFilling(filling) {
@@ -297,6 +259,10 @@ export class Polygon {
 
     getGraphics() {
         return this._graphics;
+    }
+
+    setTranslatable(translatable) {
+        this._translatable = translatable;
     }
 
     getTranslatable() {

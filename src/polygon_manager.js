@@ -1,5 +1,5 @@
 import { Polygon } from "./polygon";
-import { optimize } from "./diff_func";
+import { beginOptimization } from "./diff_func";
 
 export class polygonManager {
     constructor(app) {
@@ -91,8 +91,14 @@ export class polygonManager {
         }
     }
 
+    setFix(fixedPolygons) {
+        for (let i = 0; i < fixedPolygons.length; i++) {
+            this.polyList[i].setTranslatable(false);
+        }
+    }
+
     async optimize(eta) {
-        this.param = await optimize(this, eta);
+        this.param = await beginOptimization(this, eta);
         this.applyTransformation();
     }
 }

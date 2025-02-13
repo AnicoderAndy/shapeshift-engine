@@ -154,6 +154,35 @@ const fnTangent = (polyManager, index1, index2) => {
     }
 };
 
+const fnBorderNotOverlap = (polyManager, index1, index2, indexEdge) => {
+    const n2 = polyManager.polyList[index2].getPoints().length;
+    const segment = [polyManager.polyList[index2].getPoints()[indexEdge], polyManager.polyList[index2].getPoints()[(indexEdge + 1) % n2]];
+    const mD = Polygon.minkowskiDiff(polyManager.polyList[index1].getPoints(), segment);
+    const pIndex1 = polyManager.getParamIndex(index1);
+    const pIndex2 = polyManager.getParamIndex(index2);
+    const sdf0 = sdf0_offset(mD.length);
+
+    if (translatable(polyManager, index1) && translatable(polyManager, index2)) {
+        return fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
+            const offsetX = sub(params[pIndex2], params[pIndex1]);
+            const offsetY = sub(params[pIndex2 + 1], params[pIndex1 + 1]);
+            return mul(sqr(min(0, sdf0({ offset: [offsetX, offsetY], points: mD }))), 0.1);
+        });
+    } else if (translatable(polyManager, index1)) {
+        return fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
+            const offsetX = params[pIndex1];
+            const offsetY = params[pIndex1 + 1];
+            return mul(sqr(min(0, sdf0({ offset: [offsetX, offsetY], points: mD }))), 0.1);
+        });
+    } else if (translatable(polyManager, index2)) {
+        return fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
+            const offsetX = params[pIndex2];
+            const offsetY = params[pIndex2 + 1];
+            return mul(sqr(min(0, sdf0({ offset: [offsetX, offsetY], points: mD }))), 0.1);
+        });
+    }
+}
+
 /**
  * Return the squared penalty of the predicate that A contains B.
  * @param {polygonManager} polyManager 
@@ -162,29 +191,18 @@ const fnTangent = (polyManager, index1, index2) => {
  * @returns The squared function of Contain Penalty.
  */
 const fnContain = (polyManager, index1, index2) => {
-    const mD = Polygon.minkowskiDiff(polyManager.polyList[index1].getPoints(), [...polyManager.polyList[index2].getPoints()].reverse());
-    const pIndex1 = polyManager.getParamIndex(index1);
-    const pIndex2 = polyManager.getParamIndex(index2);
-    const sdf0 = sdf0_offset(mD.length);
-    if (translatable(polyManager, index1) && translatable(polyManager, index2)) {
-        return fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
-            const offsetX = sub(params[pIndex2], params[pIndex1]);
-            const offsetY = sub(params[pIndex2 + 1], params[pIndex1 + 1]);
-            return sqr(neg(min(0, sdf0({ offset: [offsetX, offsetY], points: mD }))));
-        });
-    } else if (translatable(polyManager, index1)) {
-        return fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
-            const offsetX = params[pIndex1];
-            const offsetY = params[pIndex1 + 1];
-            return sqr(neg(min(0, sdf0({ offset: [offsetX, offsetY], points: mD }))));
-        });
-    } else if (translatable(polyManager, index2)) {
-        return fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
-            const offsetX = params[pIndex2];
-            const offsetY = params[pIndex2 + 1];
-            return sqr(neg(min(0, sdf0({ offset: [offsetX, offsetY], points: mD }))));
-        });
+    let fnList = [fnOverlap(polyManager, index1, index2)];
+    for (let i = 0; i < polyManager.polyList[index2].getPoints().length; i++) {
+        fnList.push(fnBorderNotOverlap(polyManager, index1, index2, i));
     }
+    const ret = fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
+        let result = 0;
+        for (let i = 0; i < fnList.length; i++) {
+            result = add(result, fnList[i](params));
+        }
+        return result;
+    });
+    return ret;
 };
 
 const buildRelation = (polyManager) => {
@@ -214,7 +232,7 @@ const buildRelation = (polyManager) => {
 };
 
 const optimization = async (optimizationParameters) => {
-    const { epsilon, squaredSumPenalty, params, paramType, eta, c0 = 1e-3, eta_c = 2 } = optimizationParameters;
+    const { epsilon, squaredSumPenalty, params, paramType, eta, c0 = 1e-4, eta_c = 1.5 } = optimizationParameters;
     let c = c0;
 
     for (let epoch = 0; epoch < 50; epoch++) {
@@ -242,7 +260,7 @@ const optimization = async (optimizationParameters) => {
     return params;
 };
 
-export const optimize = async (polyManager, eta) => {
+export const beginOptimization = async (polyManager, eta) => {
     const paramType = Vec(polyManager.getTotParameter(), Real);
     const optParameters = {
         paramType: paramType,

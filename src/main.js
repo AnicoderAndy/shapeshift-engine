@@ -1,6 +1,7 @@
 import { Application } from 'pixi.js';
 import { Polygon } from './polygon.js';
 import { polygonManager } from './polygon_manager.js';
+import ClipperLib from 'clipper-lib';
 
 let drawingPoly = false;
 let points = [];
@@ -18,7 +19,7 @@ function getRandomColor() {
 function canvasDrawPolygonHandler(e) {
     points.push([e.offsetX, e.offsetY]);
     console.log(e.offsetX, e.offsetY);
-    if (points.length >= 3) {
+    if (points.length >= 2) {
         if (lastPoly) {
             lastPoly.getGraphics().destroy();
         }
@@ -41,10 +42,11 @@ function btnDrawPolyHandler() {
         polyManager.pushPolygon(newPoly);
         app.stage.addChild(newPoly.getGraphics());
 
-        lastPoly.getGraphics().destroy();
-        lastPoly = null;
+        if (lastPoly) {
+            lastPoly.getGraphics().destroy();
+            lastPoly = null;
+        }
         points = [];
-
 
         app.canvas.removeEventListener('click', canvasDrawPolygonHandler);
     }
@@ -75,12 +77,16 @@ processBtn.addEventListener('click', async () => {
     const overlap = eval(document.querySelector('#input-overlap').value) ?? [];
     const tangent = [];
     const contain = eval(document.querySelector('#input-contain').value) ?? [];
+    const fixedPolygons = eval(document.querySelector('#input-fix').value) ?? [];
 
     // Add relations to the polygon manager
     polyManager.setRelation(notOverlap, overlap, tangent, contain);
 
+    // Set fixed polygons
+    polyManager.setFix(fixedPolygons);
+
     // Start optimization process
-    await polyManager.optimize(1e-3);
+    await polyManager.optimize(1e-2);
 });
 
 debugBtn.addEventListener('click', async () => {
