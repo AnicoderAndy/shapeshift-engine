@@ -1,56 +1,5 @@
 import { Application } from 'pixi.js';
-import { Polygon } from './polygon.js';
 import { polygonManager } from './polygon_manager.js';
-import ClipperLib from 'clipper-lib';
-
-let drawingPoly = false;
-let points = [];
-let lastPoly = null;
-
-function getRandomColor() {
-    const letters = "0123456789ABCDEF";
-    let color = "";
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-function canvasDrawPolygonHandler(e) {
-    points.push([e.offsetX, e.offsetY]);
-    console.log(e.offsetX, e.offsetY);
-    if (points.length >= 2) {
-        if (lastPoly) {
-            lastPoly.getGraphics().destroy();
-        }
-        lastPoly = new Polygon([...points], 'red');
-        app.stage.addChild(lastPoly.getGraphics());
-    }
-}
-
-function btnDrawPolyHandler() {
-    drawingPoly = !drawingPoly;
-    console.log('Drawing: ', drawingPoly);
-    if (drawingPoly) {
-        app.canvas.addEventListener('click', canvasDrawPolygonHandler);
-    } else {
-        let li = document.createElement('li');
-        li.innerHTML = `Polygon ${polyManager.size()}`;
-        polyList.append(li);
-
-        const newPoly = new Polygon([...points], getRandomColor());
-        polyManager.pushPolygon(newPoly);
-        app.stage.addChild(newPoly.getGraphics());
-
-        if (lastPoly) {
-            lastPoly.getGraphics().destroy();
-            lastPoly = null;
-        }
-        points = [];
-
-        app.canvas.removeEventListener('click', canvasDrawPolygonHandler);
-    }
-}
 
 // Create a new application
 const app = new Application();
@@ -70,7 +19,7 @@ const processBtn = document.querySelector('#btn-process');
 const polyList = document.querySelector('#list-polygons');
 
 // Add event listeners to control buttons
-drawPolyBtn.addEventListener('click', btnDrawPolyHandler);
+drawPolyBtn.addEventListener('click', polyManager.drawPolyHandler.bind(polyManager));
 processBtn.addEventListener('click', async () => {
     // Get Content in the input boxes
     const notOverlap = eval(document.querySelector('#input-not-overlap').value) ?? [];
@@ -93,3 +42,7 @@ debugBtn.addEventListener('click', async () => {
     polyManager.polyList[0]._translatable = false;
     console.log(polyManager);
 });
+
+window.d = () => {
+    console.log(polyManager);
+}

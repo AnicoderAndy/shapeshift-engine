@@ -1,26 +1,56 @@
 import { Polygon } from "./polygon";
+import { Graphics } from "pixi.js";
+import { polygonGraphics } from "./polygon_graphics";
 import { beginOptimization } from "./diff_func";
+
+function getRandomColor() {
+    const letters = "0123456789ABCDEF";
+    let color = "";
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 export class polygonManager {
     constructor(app) {
-        this.app = app;
-        this.polyList = [];
-        this.drawingPoly = false;
-        this.relation = { notOverlap: [], overlap: [], tangent: [], contain: [] };
-        this.param = [];
+        // Pixijs application
+        this._app = app;
+        // List of managed polygons
+        this._polyGraphicsList = [];
+        // Relations between polygons
+        this._relation = { notOverlap: [], overlap: [], tangent: [], contain: [] };
+        // Parameters to be optimized
+        this._param = [];
         // Number of parameters for each polygon
-        this.paramSize = 2;
+        this._paramSize = 2;
         // Number of parameters for all polygons
-        this.totParameter = 0;
+        this._totParameter = 0;
+        // Indicator of the status of drawing polygon
+        this._drawingPolygon = false;
+        // List of the polygon vertices currently being drawn
+        this._currentVertices = [];
+        // Current polygonGraphics object
+        this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
+        // Handler instance for canvasDrawPolygonHandler
+        this._canvasDrawPolygonHandler = this.canvasDrawPolygonHandler.bind(this);
+    }
+
+    list() {
+        return this._polyGraphicsList;
     }
 
     /**
-     * Push a new polygon to the end of polyList.
-     * @param {Polygon} poly 
+     * Create graphics for a polygon.
+     * Add both the polygon and the graphics to the manager.
+     * Display the polygon on the screen.
+     * @param {Polygon} Polygon to be added. 
      */
     pushPolygon(poly) {
-        this.polyList.push(poly);
-        this.param.push(0, 0);
+        const pG = new polygonGraphics(poly);
+        this._polyGraphicsList.push(pG);
+        this._app.stage.addChild(pG.getGraphics());
+        this._param.push(0, 0);
     }
 
     /**
@@ -33,15 +63,53 @@ export class polygonManager {
      */
     addRelation(relation, index1, index2) {
         if (relation == 0) {
-            this.relation.notOverlap.push([index1, index2]);
+            this._relation.notOverlap.push([index1, index2]);
         } else if (relation == 1) {
-            this.relation.overlap.push([index1, index2]);
+            this._relation.overlap.push([index1, index2]);
         } else if (relation == 2) {
-            this.relation.tangent.push([index1, index2]);
+            this._relation.tangent.push([index1, index2]);
         } else if (relation == 3) {
-            this.relation.contain.push([index1, index2]);
+            this._relation.contain.push([index1, index2]);
         } else {
             throw new Error("Invalid relation type.");
+        }
+    }
+
+    canvasDrawPolygonHandler(e) {
+        this._currentVertices.push([e.offsetX, -e.offsetY]);
+        console.log(e.offsetX, -e.offsetY);
+        if (this._currentVertices.length >= 2) {
+            this._currentPolygonGraphics.setVertexList([...this._currentVertices]);
+            this._app.stage.addChild(this._currentPolygonGraphics.getGraphics());
+        }
+    }
+
+    drawPolyHandler() {
+        this._drawingPolygon = !this._drawingPolygon;
+        console.log('Drawing: ', this._drawingPolygon);
+
+        if (this._drawingPolygon) {
+            this._app.canvas.addEventListener('click', this._canvasDrawPolygonHandler);
+        } else {
+            if (this._currentVertices.length < 2) {
+                this._currentVertices = [];
+                return;
+            }
+
+            let li = document.createElement('li');
+            li.innerHTML = `Polygon ${this.size()}`;
+            // TODO: Append the li element to the document.
+    
+            const newPoly = new Polygon([...this._currentVertices], getRandomColor());
+            this.pushPolygon(newPoly);
+    
+            if (this._currentPolygonGraphics) {
+                this._currentPolygonGraphics.destroy();
+                this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
+                this._currentVertices = [];
+            }
+    
+            this._app.canvas.removeEventListener('click', this._canvasDrawPolygonHandler);
         }
     }
 
@@ -53,10 +121,14 @@ export class polygonManager {
      * @param {number[2][]} contain Relationships of B containing A.
      */
     setRelation(notOverlap, overlap, tangent, contain) {
-        this.relation.notOverlap = notOverlap;
-        this.relation.overlap = overlap;
-        this.relation.tangent = tangent;
-        this.relation.contain = contain;
+        this._relation.notOverlap = notOverlap;
+        this._relation.overlap = overlap;
+        this._relation.tangent = tangent;
+        this._relation.contain = contain;
+    }
+
+    getRelation() {
+        return this._relation;
     }
 
     /**
@@ -65,7 +137,7 @@ export class polygonManager {
      * @returns {number} Index of the inquiry.
      */
     getParamIndex(polyIndex) {
-        return polyIndex * this.paramSize;
+        return polyIndex * this._paramSize;
     }
 
     /**
@@ -73,8 +145,16 @@ export class polygonManager {
      * @returns {number} Total number of parameters for all polygons.
      */
     getTotParameter() {
-        this.totParameter = this.polyList.length * this.paramSize;
-        return this.totParameter;
+        this._totParameter = this._polyGraphicsList.length * this._paramSize;
+        return this._totParameter;
+    }
+
+    getPoints(index) {
+        return this._polyGraphicsList[index].getPolygon().getPoints();
+    }
+
+    setPolygonProperty(index, propertyName, propertyValue) {
+        this._polyGraphicsList[index].getPolygon()[propertyName] = propertyValue;
     }
 
     /**
@@ -82,23 +162,25 @@ export class polygonManager {
      * @returns {number}
      */
     size() {
-        return this.polyList.length;
+        return this._polyGraphicsList.length;
     }
 
     applyTransformation() {
-        for (let i = 0; i < this.polyList.length; i++) {
-            this.polyList[i].setOffset([this.param[this.getParamIndex(i)], this.param[this.getParamIndex(i) + 1]]);
+        for (let i = 0; i < this._polyGraphicsList.length; i++) {
+            this._polyGraphicsList[i].getPolygon().setTranslation([this._param[this.getParamIndex(i)], this._param[this.getParamIndex(i) + 1]]);
+            this._polyGraphicsList[i].getPolygon().applyTransformation();
+            this._polyGraphicsList[i].setupGraphics();
         }
     }
 
     setFix(fixedPolygons) {
         for (let i = 0; i < fixedPolygons.length; i++) {
-            this.polyList[i].setTranslatable(false);
+            this.setPolygonProperty(fixedPolygons[i], '_translatable', false);
         }
     }
 
     async optimize(eta) {
-        this.param = await beginOptimization(this, eta);
+        this._param = await beginOptimization(this, eta);
         this.applyTransformation();
     }
 }

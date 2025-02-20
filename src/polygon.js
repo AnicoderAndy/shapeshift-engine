@@ -1,3 +1,10 @@
+/**
+ * Warning: geometries in this file are not in the same coordinate system as pixijs.
+ * Polygon class for creating and manipulating polygons,
+ * providing operations like Minkowski sum, and SDF.
+ * @author Qiu Jingye   <anicoder@outlook.com>
+ */
+
 import { Graphics } from 'pixi.js';
 import ClipperLib from 'clipper-lib';
 
@@ -27,38 +34,38 @@ const invertPoints = (points) => {
 
 /**
  * Return whether a polygon's point set is in counter-clockwise order
- * @param {number[][]} points Points of a polygon
+ * @param {number[][]} vertices Vertices of a polygon
  * @returns {Boolean} Whether the polygon is in counter-clockwise order
  */
-const isCCW = (points) => {
+const isCCW = (vertices) => {
     let sum = 0;
-    for (let i = 0; i < points.length; i++) {
-        const [x1, y1] = points[i];
-        const [x2, y2] = points[(i + 1) % points.length];
+    for (let i = 0; i < vertices.length; i++) {
+        const [x1, y1] = vertices[i];
+        const [x2, y2] = vertices[(i + 1) % vertices.length];
         sum += (x2 - x1) * (y2 + y1);
     }
-    return sum > 0;
+    return sum < 0;
 };
 
 /**
  * Return whether a polygon is convex.
- * @param {number[2][]} points Points of the polygon.
- * @returns {Boolean}
+ * @param {number[2][]} vertices Vertices of the polygon.
+ * @returns {Boolean} Whether the polygon is convex.
  */
-export function isConvex(points) {
-    let isCCW = 0;
-    const n = points.length;
+function isConvex(vertices) {
+    let isCW = 0;
+    const n = vertices.length;
     for (let i = 0; i < n; i++) {
-        const [x1, y1] = points[i];
-        const [x2, y2] = points[(i + 1) % n];
-        const [x3, y3] = points[(i + 2) % n];
+        const [x1, y1] = vertices[i];
+        const [x2, y2] = vertices[(i + 1) % n];
+        const [x3, y3] = vertices[(i + 2) % n];
         const cross = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
-        if (cross > 0) {
-            isCCW++;
+        if (cross < 0) {
+            isCW++;
             break;
         }
     }
-    return isCCW === 0;
+    return isCW === 0;
 }
 
 /**
@@ -69,10 +76,10 @@ export function isConvex(points) {
  */
 function convexMinkowskiSum(pointsA, pointsB) {
     let reorder = (points) => {
-        // Find the up-left-most point
+        // Find the down-left-most point
         let pos = 0;
         for (let i = 1; i < points.length; i++) {
-            if (points[i][1] > points[pos][1] || (points[i][1] === points[pos][1] && points[i][0] < points[pos][0])) {
+            if (points[i][1] < points[pos][1] || (points[i][1] === points[pos][1] && points[i][0] < points[pos][0])) {
                 pos = i;
             }
         }
@@ -83,8 +90,8 @@ function convexMinkowskiSum(pointsA, pointsB) {
     let b = reorder(pointsB);
     a.push(a[0], a[1]);
     b.push(b[0], b[1]);
-    let ret = [];
 
+    let ret = [];
     let i = 0;
     let j = 0;
 
@@ -94,33 +101,25 @@ function convexMinkowskiSum(pointsA, pointsB) {
         let vecB = vecMinus(b[j + 1], b[j]);
         let crossProduct = cross(vecA, vecB);
         // Note that the y-axis in pixijs is inverted
-        if (crossProduct <= 0 && i < a.length - 2) i++;
-        if (crossProduct >= 0 && j < b.length - 2) j++;
+        if (crossProduct >= 0 && i < a.length - 2) i++;
+        if (crossProduct <= 0 && j < b.length - 2) j++;
     }
 
     return ret;
 }
 
 export class Polygon {
-    constructor(points, filling) {
+    constructor(vertexList, filling) {
         // Number of points of this polygon
-        this._n = points.length;
+        this._n = vertexList.length;
         // TODO: Check whether given points make a valid polygon.
         // TODO: Check polygon is convex or not.
-        // Points of this polygon (ensure CCW order)
-        this._points = points;
-        if (!isCCW(points)) {
-            this._points.reverse();
+        // Vertices of this polygon (ensure CCW order)
+        this._vertexList = vertexList;
+        if (!isCCW(vertexList)) {
+            this._vertexList.reverse();
         }
         this._filling = filling;
-        this._graphics = new Graphics();
-        if (this._n == 2) {
-            drawLine(points[0][0], points[0][1], points[1][0], points[1][1], this._graphics, filling);
-        }
-        else {
-            this._graphics.poly([].concat(...this._points));
-            this._graphics.fill(filling);
-        }
 
         // Properties for whether allowed to transform
         this._translatable = true;
@@ -128,7 +127,7 @@ export class Polygon {
         this._rotatable = false;
 
         // Transformation properties
-        this._offset = [0, 0];   // Translation
+        this._translation = [0, 0];   // Translation
         this._scale = [1., 1.];
         this._rotation = 0; // In Radians
     }
@@ -152,8 +151,7 @@ export class Polygon {
             pathB.push({ X: pointsB[i][0], Y: pointsB[i][1] });
         }
         const result = ClipperLib.Clipper.MinkowskiSum(pathA, pathB, true)[0];
-        // console.log(result, ClipperLib.Clipper.MinkowskiSum(pathA, [...pathB].reverse(), true)[0]);
-        const ret = [];
+        let ret = [];
         for (let i = 0; i < result.length; i++) {
             ret.push([result[i].X, result[i].Y]);
         }
@@ -186,7 +184,7 @@ export class Polygon {
         let e = true;
         let j = 0;
         let s = 1;
-        let n = points.length;
+        const n = points.length;
         let v0 = vecMinus(points[0], points[n - 1]);
         for (let i = 0; i < n; i++) {
             let u = vecMinus(X, points[i]);
@@ -196,16 +194,14 @@ export class Polygon {
             if (udotv >= 0 && udotv < z) {
                 let dd = sqr(cross(u, v)) / z;
                 if (dd < d) {
-                    d = dd;
-                    j = i;
-                    e = true;
+                    if (dd < d) {
+                        d = dd, j = i, e = true;
+                    }
                 }
             } else {
                 let dd = dot(u, u);
                 if (dd < d) {
-                    d = dd;
-                    s = 1;
-                    e = false;
+                    d = dd, s = 1, e = false;
                     if (cross(v0, v) < 0) {
                         s = -1;
                     }
@@ -216,49 +212,52 @@ export class Polygon {
         if (e) {
             let u = vecMinus(X, points[j]);
             let v = vecMinus(points[(j + 1) % n], points[j]);
-            return -1 * cross(u, v) / Math.sqrt(dot(v, v));
+            return cross(u, v) / Math.sqrt(dot(v, v));
         } else {
-            return -1 * s * Math.sqrt(d);
+            return s * Math.sqrt(d);
         }
     }
 
     getPoints() {
-        return this._points;
+        return this._vertexList;
     }
 
-    setPoints(points) {
-        this._points = points;
+    setVertexList(vertexList) {
+        this._vertexList = vertexList;
     }
 
     getN() {
-        this._n = this._points.length;
+        this._n = this._vertexList.length;
         return this._n;
     }
 
-    getOffset() {
-        return this._offset;
+    getTranslation() {
+        return this._translation;
     }
 
-    setOffset(offset) {
-        this._offset = offset;
-        this._graphics.clear();
-        this._graphics.translateTransform(offset[0], offset[1]);
-        if (this._n == 2) {
-            drawLine(this._points[0][0], this._points[0][1], this._points[1][0], this._points[1][1], this._graphics, this._filling);
-        } else {
-            this._graphics.poly([].concat(...this._points));
-            this._graphics.fill(this._filling);
-        }
+    setTranslation(translation) {
+        this._translation = translation;
+    }
 
+    /**
+     * Update the vertices by applying transformation.
+     * Then **clear the transformation**.
+     */
+    applyTransformation() {
+        let points = [];
+        for (let i = 0; i < this._vertexList.length; i++) {
+            points.push(vecAdd(this._vertexList[i], this._translation));
+        }
+        this._translation = [0, 0];
+        this.setVertexList(points);
     }
 
     setFilling(filling) {
         this._filling = filling;
-        this._graphics.fill(filling);
     }
 
-    getGraphics() {
-        return this._graphics;
+    getFilling() {
+        return this._filling;
     }
 
     setTranslatable(translatable) {
