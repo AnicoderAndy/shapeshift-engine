@@ -1,3 +1,4 @@
+//@ts-check
 /**
  * Warning: geometries in this file are not in the same coordinate system as pixijs.
  * Polygon class for creating and manipulating polygons,
@@ -8,10 +9,43 @@
 import { Graphics } from 'pixi.js';
 import ClipperLib from 'clipper-lib';
 
+/**
+ * 
+ * @param {[number, number]} a 
+ * @param {[number, number]} b 
+ * @returns {number}
+ */
 const cross = (a, b) => a[0] * b[1] - a[1] * b[0];
+
+/**
+ * 
+ * @param {[number, number]} a 
+ * @param {[number, number]} b 
+ * @returns {number}
+ */
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
+
+/**
+ * Return x * x
+ * @param {number} x 
+ * @returns {number}
+ */
 const sqr = (x) => x * x;
+
+/**
+ * 
+ * @param {[number, number]} a 
+ * @param {[number, number]} b 
+ * @returns {[number, number]}
+ */
 const vecAdd = (a, b) => [a[0] + b[0], a[1] + b[1]];
+
+/**
+ * 
+ * @param {[number, number]} a 
+ * @param {[number, number]} b 
+ * @returns {[number, number]}
+ */
 const vecMinus = (a, b) => [a[0] - b[0], a[1] - b[1]];
 
 const drawLine = (x1, y1, x2, y2, g, filling) => {
@@ -21,10 +55,11 @@ const drawLine = (x1, y1, x2, y2, g, filling) => {
 
 /**
  * Symmetrically invert the points of a polygon about the origin
- * @param {number[2][]} points Points of a polygon
- * @returns {number[2][]} Resulting points
+ * @param {[number, number][]} points Points of a polygon
+ * @returns {[number, number][]} Resulting points
  */
 const invertPoints = (points) => {
+    /**@type {[number, number][]} */
     let inverted = [];
     for (let i = 0; i < points.length; i++) {
         inverted.push([-points[i][0], -points[i][1]]);
@@ -49,7 +84,7 @@ const isCCW = (vertices) => {
 
 /**
  * Return whether a polygon is convex.
- * @param {number[2][]} vertices Vertices of the polygon.
+ * @param {[number, number][]} vertices Vertices of the polygon.
  * @returns {Boolean} Whether the polygon is convex.
  */
 function isConvex(vertices) {
@@ -70,9 +105,9 @@ function isConvex(vertices) {
 
 /**
  * Called by minkowskiSum when both A and B are convex
- * @param {number[][]} pointsA Coordinates of the first polygon
- * @param {number[][]} pointsB Coordinates of the second polygon
- * @returns {number[][]} Coordinates of the resulting polygon
+ * @param {[number, number][]} pointsA Coordinates of the first polygon
+ * @param {[number, number][]} pointsB Coordinates of the second polygon
+ * @returns {[number, number][]} Coordinates of the resulting polygon
  */
 function convexMinkowskiSum(pointsA, pointsB) {
     let reorder = (points) => {
@@ -91,6 +126,7 @@ function convexMinkowskiSum(pointsA, pointsB) {
     a.push(a[0], a[1]);
     b.push(b[0], b[1]);
 
+    /**@type {[number, number][]} */
     let ret = [];
     let i = 0;
     let j = 0;
@@ -127,6 +163,7 @@ export class Polygon {
         this._rotatable = false;
 
         // Transformation properties
+        /**@type {[number, number]} */
         this._translation = [0, 0];   // Translation
         this._scale = [1., 1.];
         this._rotation = 0; // In Radians
@@ -134,9 +171,9 @@ export class Polygon {
 
     /**
      * Return the Minkowski sum of two polygons
-     * @param {number[2][]} pointsA Coordinates of the first polygon
-     * @param {number[2][]} pointsB Coordinates of the second polygon
-     * @returns {number[2]} Coordinates of the resulting polygon
+     * @param {[number, number][]} pointsA Coordinates of the first polygon
+     * @param {[number, number][]} pointsB Coordinates of the second polygon
+     * @returns {[number, number][]} Coordinates of the resulting polygon
      */
     static minkowskiSum(pointsA, pointsB) {
         if (isConvex(pointsA) && isConvex(pointsB)) {
@@ -151,6 +188,7 @@ export class Polygon {
             pathB.push({ X: pointsB[i][0], Y: pointsB[i][1] });
         }
         const result = ClipperLib.Clipper.MinkowskiSum(pathA, pathB, true)[0];
+        /**@type {[number, number][]} */
         let ret = [];
         for (let i = 0; i < result.length; i++) {
             ret.push([result[i].X, result[i].Y]);
@@ -161,9 +199,9 @@ export class Polygon {
 
     /**
      * Return the Minkowski difference points of two polygon points
-     * @param {number[2][]} pointsA Coordinates of the first polygon
-     * @param {number[2][]} pointsB Coordinates of the second polygon
-     * @returns {number[2][]} Coordinates of the resulting polygon
+     * @param {[number, number][]} pointsA Coordinates of the first polygon
+     * @param {[number, number][]} pointsB Coordinates of the second polygon
+     * @returns {[number, number][]} Coordinates of the resulting polygon
      */
     static minkowskiDiff(pointsA, pointsB) {
         let inverted = invertPoints(pointsB);
@@ -175,8 +213,8 @@ export class Polygon {
      * Algorithm from the appendix of the paper "Minkowski Penalties"
      * 
      * TODO: This function has a correction multiplier '-1' to the result due to the inverted y-axis. Direct computation needed.
-     * @param {number[2]} X coordiate of X
-     * @param {number[2][]} points coordinates of the polygon
+     * @param {[number, number]} X coordiate of X
+     * @param {[number, number][]} points coordinates of the polygon
      * @returns {number} SDF value
      */
     static SDF(X, points) {
@@ -235,6 +273,9 @@ export class Polygon {
         return this._translation;
     }
 
+    /**
+     * @param {[number, number]} translation
+     */
     setTranslation(translation) {
         this._translation = translation;
     }
