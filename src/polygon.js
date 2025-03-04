@@ -7,46 +7,8 @@
  */
 
 import { Graphics } from 'pixi.js';
+import { cross, dot, vecAdd, vecMinus, sqr } from './utilities'
 import ClipperLib from 'clipper-lib';
-
-/**
- * 
- * @param {[number, number]} a 
- * @param {[number, number]} b 
- * @returns {number}
- */
-const cross = (a, b) => a[0] * b[1] - a[1] * b[0];
-
-/**
- * 
- * @param {[number, number]} a 
- * @param {[number, number]} b 
- * @returns {number}
- */
-const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
-
-/**
- * Return x * x
- * @param {number} x 
- * @returns {number}
- */
-const sqr = (x) => x * x;
-
-/**
- * 
- * @param {[number, number]} a 
- * @param {[number, number]} b 
- * @returns {[number, number]}
- */
-const vecAdd = (a, b) => [a[0] + b[0], a[1] + b[1]];
-
-/**
- * 
- * @param {[number, number]} a 
- * @param {[number, number]} b 
- * @returns {[number, number]}
- */
-const vecMinus = (a, b) => [a[0] - b[0], a[1] - b[1]];
 
 const drawLine = (x1, y1, x2, y2, g, filling) => {
     g.moveTo(x1, y1); g.lineTo(x2, y2);
@@ -147,10 +109,12 @@ function convexMinkowskiSum(pointsA, pointsB) {
 export class Polygon {
     constructor(vertexList, filling) {
         // Number of points of this polygon
+        /**@type {number} */
         this._n = vertexList.length;
         // TODO: Check whether given points make a valid polygon.
         // TODO: Check polygon is convex or not.
         // Vertices of this polygon (ensure CCW order)
+        /**@type {[number, number][]} */
         this._vertexList = vertexList;
         if (!isCCW(vertexList)) {
             this._vertexList.reverse();

@@ -11,7 +11,7 @@ const min = (x, y) => select(lt(x, y), Real, x, y);
 const vecAdd = (a, b) => struct([add(a[0], b[0]), add(a[1], b[1])]);
 const vecMinus = (a, b) => struct([sub(a[0], b[0]), sub(a[1], b[1])]);
 // Use this as a macro. Return whether a polygon is translatable(Boolean).
-const translatable = (polyManager, index) => polyManager._polyGraphicsList[index].getPolygon().getTranslatable();
+const translatable = (polyManager, index) => polyManager.list()[index].getPolygon().getTranslatable();
 
 /**
  * Return a opaque function that computes sdf(0) of a polygon with n points and an offset.
