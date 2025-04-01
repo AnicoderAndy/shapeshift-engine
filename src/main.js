@@ -1,6 +1,14 @@
 import { Application } from 'pixi.js';
 import { polygonManager } from './polygon_manager.js';
 
+// Get polygon list element
+const uiPolyList = document.querySelector('#list-polygons');
+
+// Get control buttons' elements
+const drawPolyBtn = document.querySelector('#btn-draw-poly');
+const debugBtn = document.querySelector('#btn-debug');
+const processBtn = document.querySelector('#btn-process');
+
 // Create a new application
 const app = new Application();
 await app.init({ width: 1000, height: 800, backgroundColor: 'white' });
@@ -8,15 +16,7 @@ app.canvas.style.border = '1px solid black';
 document.querySelector('#canvas').append(app.canvas);
 
 // Create a polygon manager
-const polyManager = new polygonManager(app);
-
-// Get control buttons' elements
-const drawPolyBtn = document.querySelector('#btn-draw-poly');
-const debugBtn = document.querySelector('#btn-debug');
-const processBtn = document.querySelector('#btn-process');
-
-// Get polygon list element
-const polyList = document.querySelector('#list-polygons');
+const polyManager = new polygonManager(app, uiPolyList);
 
 // Add event listeners to control buttons
 drawPolyBtn.addEventListener('click', polyManager.drawPolyHandler.bind(polyManager));
@@ -25,7 +25,7 @@ processBtn.addEventListener('click', async () => {
     const notOverlap = eval(document.querySelector('#input-not-overlap').value) ?? [];
     const overlap = eval(document.querySelector('#input-overlap').value) ?? [];
     const tangent = [];
-    const contain = eval(document.querySelector('#input-contain').value) ?? [];
+    const contain = [];
     const fixedPolygons = eval(document.querySelector('#input-fix').value) ?? [];
 
     // Add relations to the polygon manager
@@ -39,8 +39,19 @@ processBtn.addEventListener('click', async () => {
 });
 
 debugBtn.addEventListener('click', async () => {
-    polyManager.polyList[0]._translatable = false;
-    console.log(polyManager);
+    let graphicsRef = polyManager.getList()[0].getGraphics();
+    let alphaDirection = -0.05;
+    const flicker = () => {
+        graphicsRef.alpha += alphaDirection;
+        if (graphicsRef.alpha <= 0.2 || graphicsRef.alpha >= 1) {
+            alphaDirection *= -1;
+        }
+    };
+    app.ticker.add(flicker);
+    setTimeout(() => {
+        app.ticker.remove(flicker);
+        graphicsRef.alpha = 1;
+    }, 250);
 });
 
 window.d = () => {

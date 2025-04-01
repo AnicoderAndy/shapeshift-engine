@@ -6,7 +6,6 @@
  * @author Qiu Jingye   <anicoder@outlook.com>
  */
 
-import { Graphics } from 'pixi.js';
 import { cross, dot, vecAdd, vecMinus, sqr } from './utilities'
 import ClipperLib from 'clipper-lib';
 

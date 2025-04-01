@@ -1,7 +1,15 @@
+//@ts-check
 import { Polygon } from "./polygon";
-import { Graphics } from "pixi.js";
+import { Application, Graphics, Ticker } from "pixi.js";
 import { polygonGraphics } from "./polygon_graphics";
 import { beginOptimization } from "./diff_func";
+/**
+ * @typedef {Object} Relation
+ * @property {[number, number][]} notOverlap
+ * @property {[number, number][]} overlap
+ * @property {[number, number][]} tangent
+ * @property {[number, number][]} contain
+ */
 
 function getRandomColor() {
     const letters = "0123456789ABCDEF";
@@ -12,13 +20,39 @@ function getRandomColor() {
     return color;
 }
 
+/**
+ * 
+ * @param {Graphics} graphicsRef 
+ * @returns {import("pixi.js").TickerCallback<any>}
+ */
+function makeFlickerHandler(graphicsRef) {
+    /**
+     * @param {Ticker} ticker 
+     */
+    const flicker = (ticker) => {
+        let alphaDirection = -0.05;
+        graphicsRef.alpha += alphaDirection;
+        if (graphicsRef.alpha <= 0.2 || graphicsRef.alpha >= 1) {
+            alphaDirection *= -1;
+        }
+    };
+    return flicker;
+}
+
 export class polygonManager {
-    constructor(app) {
+    /**
+     * 
+     * @param {Application} app 
+     * @param {Element} uiPolyList 
+     */
+    constructor(app, uiPolyList) {
         // Pixijs application
         this._app = app;
         // List of managed polygons
+        /**@type {polygonGraphics[]} */
         this._polyGraphicsList = [];
         // Relations between polygons
+        /**@type {Relation} */
         this._relation = { notOverlap: [], overlap: [], tangent: [], contain: [] };
         // Parameters to be optimized
         this._param = [];
@@ -34,9 +68,11 @@ export class polygonManager {
         this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
         // Handler instance for canvasDrawPolygonHandler
         this._canvasDrawPolygonHandler = this.canvasDrawPolygonHandler.bind(this);
+        // PolyList in index.html
+        this._uiPolyList = uiPolyList;
     }
 
-    list() {
+    getList() {
         return this._polyGraphicsList;
     }
 
@@ -44,7 +80,7 @@ export class polygonManager {
      * Create graphics for a polygon.
      * Add both the polygon and the graphics to the manager.
      * Display the polygon on the screen.
-     * @param {Polygon} Polygon to be added. 
+     * @param {Polygon} poly to be added. 
      */
     pushPolygon(poly) {
         const pG = new polygonGraphics(poly);
@@ -96,29 +132,39 @@ export class polygonManager {
                 return;
             }
 
-            let li = document.createElement('li');
-            li.innerHTML = `Polygon ${this.size()}`;
-            // TODO: Append the li element to the document.
-    
             const newPoly = new Polygon([...this._currentVertices], getRandomColor());
             this.pushPolygon(newPoly);
-    
+
             if (this._currentPolygonGraphics) {
                 this._currentPolygonGraphics.destroy();
                 this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
                 this._currentVertices = [];
             }
-    
+
             this._app.canvas.removeEventListener('click', this._canvasDrawPolygonHandler);
+
+            let li = document.createElement('li');
+            const polygonIndex = this.size() - 1;
+            li.innerHTML = `Polygon ${polygonIndex}`;
+            this._uiPolyList.appendChild(li);
+            li.addEventListener('click', () => {
+                const graphicsRef = this._polyGraphicsList[polygonIndex].getGraphics();
+                const flicker = makeFlickerHandler(graphicsRef);
+                this._app.ticker.add(flicker);
+                setTimeout(() => {
+                    this._app.ticker.remove(flicker);
+                    graphicsRef.alpha = 1;
+                }, 250);
+            });
         }
     }
 
     /**
      * Set relation and stores them in the manager. A relation is a list of pairs of polygon indices.
-     * @param {number[2][]} notOverlap Relationships of not overlapping polygons
-     * @param {number[2][]} overlap Relationships of overlapping polygons.
-     * @param {number[2][]} tangent Relationships of tangenting polygons.
-     * @param {number[2][]} contain Relationships of B containing A.
+     * @param {[number, number][]} notOverlap Relationships of not overlapping polygons
+     * @param {[number, number][]} overlap Relationships of overlapping polygons.
+     * @param {[number, number][]} tangent Relationships of tangenting polygons.
+     * @param {[number, number][]} contain Relationships of B containing A.
      */
     setRelation(notOverlap, overlap, tangent, contain) {
         this._relation.notOverlap = notOverlap;
