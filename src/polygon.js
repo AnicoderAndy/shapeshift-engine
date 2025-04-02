@@ -156,7 +156,6 @@ export class Polygon {
         for (let i = 0; i < result.length; i++) {
             ret.push([result[i].X, result[i].Y]);
         }
-        ret.reverse();
         return ret;
     }
 
