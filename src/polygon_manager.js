@@ -43,9 +43,10 @@ export class polygonManager {
     /**
      * 
      * @param {Application} app 
-     * @param {Element} uiPolyList 
+     * @param {Element} uiPolyList
+     * @param {{randomColorInput: HTMLInputElement; polygonColorInput: HTMLInputElement;}} colorInput
      */
-    constructor(app, uiPolyList) {
+    constructor(app, uiPolyList, colorInput) {
         // Pixijs application
         this._app = app;
         // List of managed polygons
@@ -70,6 +71,8 @@ export class polygonManager {
         this._canvasDrawPolygonHandler = this.canvasDrawPolygonHandler.bind(this);
         // PolyList in index.html
         this._uiPolyList = uiPolyList;
+        // Color Input controls
+        this._colorController = colorInput;
     }
 
     getList() {
@@ -132,7 +135,8 @@ export class polygonManager {
                 return;
             }
 
-            const newPoly = new Polygon([...this._currentVertices], getRandomColor());
+            const color = this._colorController.randomColorInput.checked ? getRandomColor() : this._colorController.polygonColorInput.value;
+            const newPoly = new Polygon([...this._currentVertices], color);
             this.pushPolygon(newPoly);
 
             if (this._currentPolygonGraphics) {

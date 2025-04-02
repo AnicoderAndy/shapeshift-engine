@@ -4,6 +4,11 @@ import { polygonManager } from './polygon_manager.js';
 // Get polygon list element
 const uiPolyList = document.querySelector('#list-polygons');
 
+// Get color control elements
+const randomColorInput = document.querySelector('#input-polygon-random-color');
+const polygonColorInput = document.querySelector('#input-polygon-color');
+const colorInput = { randomColorInput, polygonColorInput };
+
 // Get control buttons' elements
 const drawPolyBtn = document.querySelector('#btn-draw-poly');
 const debugBtn = document.querySelector('#btn-debug');
@@ -16,7 +21,7 @@ app.canvas.style.border = '1px solid black';
 document.querySelector('#canvas').append(app.canvas);
 
 // Create a polygon manager
-const polyManager = new polygonManager(app, uiPolyList);
+const polyManager = new polygonManager(app, uiPolyList, colorInput);
 
 // Add event listeners to control buttons
 drawPolyBtn.addEventListener('click', polyManager.drawPolyHandler.bind(polyManager));
