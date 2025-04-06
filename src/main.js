@@ -58,7 +58,3 @@ debugBtn.addEventListener('click', async () => {
         graphicsRef.alpha = 1;
     }, 250);
 });
-
-window.d = () => {
-    console.log(polyManager);
-}
