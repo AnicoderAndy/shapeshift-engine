@@ -5,7 +5,7 @@ const isGithubPages = process.env.GITHUB_PAGES === 'true';
 export default defineConfig({
   plugins: [topLevelAwait()],
   build: { target: 'es2022' },
-  base: isGithubPages ? "/<REPO>/" : "/",
+  base: isGithubPages ? "/constraint-canvas/" : "/",
 
   // Vite bundles external dependencies by default in development mode, but that
   // process does not include assets; this option disables that particular kind
