@@ -1,10 +1,11 @@
 import { defineConfig } from "vite";
 import topLevelAwait from "vite-plugin-top-level-await";
 
+const isGithubPages = process.env.GITHUB_PAGES === 'true';
 export default defineConfig({
-  // the plugin described above
   plugins: [topLevelAwait()],
   build: { target: 'es2022' },
+  base: isGithubPages ? "/<REPO>/" : "/",
 
   // Vite bundles external dependencies by default in development mode, but that
   // process does not include assets; this option disables that particular kind
