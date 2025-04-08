@@ -123,8 +123,11 @@ export class polygonManager {
         }
     }
 
-    drawPolyHandler() {
+    drawPolyHandler(event) {
         this._drawingPolygon = !this._drawingPolygon;
+        const button = event.currentTarget;
+
+        button.textContent = this._drawingPolygon ? 'Drawing...Click again to confirm' : 'New Polygon';
         console.log('Drawing: ', this._drawingPolygon);
 
         if (this._drawingPolygon) {
