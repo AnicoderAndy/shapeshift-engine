@@ -1,5 +1,5 @@
-# Constraint Canvas
-基于微分学的图形排布工具。用户通过绘制多边形，并提出对多边形“重合”“不重合”的需求，Constraint Canvas 会基于梯度下降的方式将多边形平移，生成用户需求的排布。
+# ShapeShift Engine 形动引擎
+基于微分学的图形排布工具。用户通过绘制多边形，并提出对多边形“重合”“不重合”的需求，ShapeShift Engine 会基于梯度下降的方式将多边形平移，生成用户需求的排布。
 
 ### 本地构建
 1. 克隆本项目，进入项目目录。
@@ -8,7 +8,7 @@
 4. 部署 `dist` 目录中的文件。下面提供了两种常见的轻量级部署方式：
    - 使用 Python 部署：执行 `python -m http.server <port>`。将 `<port>` 替换为目标端口。
    - 使用 http-server 部署：通过 `npm install -g http-server` 全局安装 http-server，执行 `http-server -p <port> -g` 启动服务器。将 `<port>` 替换为目标端口。
-5. 部署完成后，使用浏览器访问 `http://localhost:<port>`。
+5. 部署完成后，使用浏览器访问 `http://localhost:<port>`。将 `<port>` 替换为目标端口。
 
 ### 使用方法
 #### 绘制多边形
