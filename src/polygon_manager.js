@@ -39,53 +39,6 @@ function makeFlickerHandler(graphicsRef) {
     return flicker;
 }
 
-// Function to check if two line segments intersect
-function doLinesIntersect(p1, q1, p2, q2) {
-
-    // Helper function to find the orientation of the ordered triplet (p, q, r)
-    function orientation(p, q, r) {
-        const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
-        if (val === 0) return 0; // collinear
-        return val > 0 ? 1 : 2; // clock or counterclockwise
-    }
-
-    // Helper function to check if point q lies on line segment 'pr'
-    function onSegment(p, q, r) {
-        return q[0] <= Math.max(p[0], r[0]) && q[0] >= Math.min(p[0], r[0]) &&
-            q[1] <= Math.max(p[1], r[1]) && q[1] >= Math.min(p[1], r[1]);
-    }
-
-    const o1 = orientation(p1, q1, p2);
-    const o2 = orientation(p1, q1, q2);
-    const o3 = orientation(p2, q2, p1);
-    const o4 = orientation(p2, q2, q1);
-
-    if (o1 !== o2 && o3 !== o4) return true;
-
-    if (o1 === 0 && onSegment(p1, p2, q1)) return true;
-    if (o2 === 0 && onSegment(p1, q2, q1)) return true;
-    if (o3 === 0 && onSegment(p2, p1, q2)) return true;
-    if (o4 === 0 && onSegment(p2, q1, q2)) return true;
-
-    return false;
-}
-
-// Check if the polygon is simple
-function isSimplePolygon(vertices) {
-    const n = vertices.length;
-    for (let i = 0; i < n; i++) {
-        for (let j = i + 1; j < n; j++) {
-            // Skip adjacent edges and the same edge
-            if (Math.abs(i - j) === 1 || (i === 0 && j === n - 1)) continue;
-
-            if (doLinesIntersect(vertices[i], vertices[(i + 1) % n], vertices[j], vertices[(j + 1) % n])) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
 export class polygonManager {
     /**
      * 
@@ -188,7 +141,7 @@ export class polygonManager {
             }
 
             // Check if the polygon is simple
-            if (!isSimplePolygon(this._currentVertices)) {
+            if (!Polygon.isSimplePolygon(this._currentVertices)) {
                 console.error("The polygon is not simple (edges intersect). Please redraw.");
                 alert("The polygon is not simple (edges intersect). Please redraw.");
 
