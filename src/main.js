@@ -1,5 +1,6 @@
 import { Application } from 'pixi.js';
 import { polygonManager } from './polygon_manager.js';
+import { polygon2svg } from './polygon2svg.js';
 
 
 (async () => {
@@ -13,6 +14,7 @@ import { polygonManager } from './polygon_manager.js';
 
     // Get control buttons' elements
     const drawPolyBtn = document.querySelector('#btn-draw-poly');
+    const downloadSvgBtn = document.querySelector('#btn-download-svg');
     const debugBtn = document.querySelector('#btn-debug');
     const processBtn = document.querySelector('#btn-process');
 
@@ -45,19 +47,16 @@ import { polygonManager } from './polygon_manager.js';
         await polyManager.optimize(1e-2);
     });
 
-    debugBtn.addEventListener('click', async () => {
-        let graphicsRef = polyManager.getList()[0].getGraphics();
-        let alphaDirection = -0.05;
-        const flicker = () => {
-            graphicsRef.alpha += alphaDirection;
-            if (graphicsRef.alpha <= 0.2 || graphicsRef.alpha >= 1) {
-                alphaDirection *= -1;
-            }
-        };
-        app.ticker.add(flicker);
-        setTimeout(() => {
-            app.ticker.remove(flicker);
-            graphicsRef.alpha = 1;
-        }, 250);
+    downloadSvgBtn.addEventListener('click', async () => {
+        const svg = polygon2svg(polyManager);
+        const blob = new Blob([svg], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = 'shapeshift-export.svg';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(url);
     });
 })();
