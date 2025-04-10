@@ -130,3 +130,27 @@ export const ccwInBetween = (d, d1, d2) => {
  */
 export const isCollinearLine = (a, b, c, d) =>
     orientation(a, b, c) == 0 && orientation(a, b, d) == 0;
+
+/**
+ * Returns true iff the straight line ab intersects with the line cd.
+ * @param {[number, number]} a Point
+ * @param {[number, number]} b Point
+ * @param {[number, number]} c Point
+ * @param {[number, number]} d Point
+ * @returns {boolean} True iff the line segment ab and cd are collinear.
+ */
+export const isIntersectingLine = (a, b, c, d) => {
+    if (isCollinearLine(a, b, c, d)) {
+        return false;
+    }
+    const o1 = orientation(a, b, c);
+    const o2 = orientation(a, b, d);
+    const o3 = orientation(c, d, a);
+    const o4 = orientation(c, d, b);
+    // Helper function to check if point q lies on line segment 'pr'
+    function onSegment(p, q, r) {
+        return q[0] <= Math.max(p[0], r[0]) && q[0] >= Math.min(p[0], r[0]) &&
+            q[1] <= Math.max(p[1], r[1]) && q[1] >= Math.min(p[1], r[1]);
+    }
+    return (o1 != o2 && o3 != o4) || (o1 == 0 && onSegment(a, c, b)) || (o2 == 0 && onSegment(a, d, b)) || (o3 == 0 && onSegment(c, a, d)) || (o4 == 0 && onSegment(c, b, d));
+}

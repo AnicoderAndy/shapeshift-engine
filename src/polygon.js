@@ -6,7 +6,7 @@
  * @author Qiu Jingye   <anicoder@outlook.com>
  */
 
-import { cross, dot, vecAdd, vecMinus, sqr } from './utilities'
+import { cross, dot, vecAdd, vecMinus, sqr, isIntersectingLine } from './utilities'
 import ClipperLib from 'clipper-lib';
 
 const drawLine = (x1, y1, x2, y2, g, filling) => {
@@ -216,6 +216,26 @@ export class Polygon {
         } else {
             return s * Math.sqrt(d);
         }
+    }
+
+    /**
+     * 
+     * @param {*} vertices 
+     * @returns 
+     */
+    // Check if the polygon is simple
+    static isSimplePolygon(vertices) {
+        const n = vertices.length;
+        for (let i = 0; i < n; i++) {
+            for (let j = i + 1; j < n; j++) {
+                // Skip adjacent edges and the same edge
+                if (Math.abs(i - j) === 1 || (i === 0 && j === n - 1)) continue;
+                if (isIntersectingLine(vertices[i], vertices[(i + 1) % n], vertices[j], vertices[(j + 1) % n])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     getPoints() {

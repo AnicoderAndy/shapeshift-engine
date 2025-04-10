@@ -134,6 +134,24 @@ export class polygonManager {
             this._app.canvas.addEventListener('click', this._canvasDrawPolygonHandler);
         } else {
             if (this._currentVertices.length < 2) {
+                console.error("A polygon must have at least 2 vertices.");
+                alert("A polygon must have at least 2 vertices.");
+                this._currentVertices = [];
+                return;
+            }
+
+            // Check if the polygon is simple
+            if (!Polygon.isSimplePolygon(this._currentVertices)) {
+                console.error("The polygon is not simple (edges intersect). Please redraw.");
+                alert("The polygon is not simple (edges intersect). Please redraw.");
+
+                // remove the graphics from the stage
+                if (this._currentPolygonGraphics) {
+                    this._app.stage.removeChild(this._currentPolygonGraphics.getGraphics());
+                    this._currentPolygonGraphics.destroy();
+                    this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
+                }
+
                 this._currentVertices = [];
                 return;
             }
