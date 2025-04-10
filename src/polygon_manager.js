@@ -21,15 +21,12 @@ function getRandomColor() {
 }
 
 /**
- * 
- * @param {Graphics} graphicsRef 
- * @returns {import("pixi.js").TickerCallback<any>}
+ * Generate a flicker handler for a specific Graphics object.
+ * @param {Graphics} graphicsRef The Graphics object to flicker.
+ * @returns {import("pixi.js").TickerCallback<any>} The flicker handler function.
  */
 function makeFlickerHandler(graphicsRef) {
-    /**
-     * @param {Ticker} ticker 
-     */
-    const flicker = (ticker) => {
+    const flicker = () => {
         let alphaDirection = -0.05;
         graphicsRef.alpha += alphaDirection;
         if (graphicsRef.alpha <= 0.2 || graphicsRef.alpha >= 1) {
@@ -41,7 +38,7 @@ function makeFlickerHandler(graphicsRef) {
 
 export class polygonManager {
     /**
-     * 
+     * Create a polygonManager object.
      * @param {Application} app 
      * @param {Element} uiPolyList
      * @param {{randomColorInput: HTMLInputElement; polygonColorInput: HTMLInputElement;}} colorInput
@@ -114,6 +111,11 @@ export class polygonManager {
         }
     }
 
+    /**
+     * Handler for the canvas object to obtain user's clicking position,
+     * and pushing the offset to the current vertices list.
+     * @param {MouseEvent} e 
+     */
     canvasDrawPolygonHandler(e) {
         this._currentVertices.push([e.offsetX, -e.offsetY]);
         console.log(e.offsetX, -e.offsetY);
@@ -123,9 +125,9 @@ export class polygonManager {
         }
     }
 
-    drawPolyHandler(event) {
+    drawPolyHandler(e) {
         this._drawingPolygon = !this._drawingPolygon;
-        const button = event.currentTarget;
+        const button = e.currentTarget;
 
         button.textContent = this._drawingPolygon ? 'Drawing...Click again to confirm' : 'New Polygon';
         console.log('Drawing: ', this._drawingPolygon);
@@ -220,10 +222,21 @@ export class polygonManager {
         return this._totParameter;
     }
 
+    /**
+     * Get the vertex list of a polygon by giving its index.
+     * @param {number} index The index of the polygon.
+     * @returns VertexList of the required polygon.
+     */
     getPoints(index) {
         return this._polyGraphicsList[index].getPolygon().getPoints();
     }
 
+    /**
+     * Set a specific property by giving property name, polygon index, and its value.
+     * @param {number} index The index of the polygon
+     * @param {string} propertyName Name of the property to be set
+     * @param {any} propertyValue Property value.
+     */
     setPolygonProperty(index, propertyName, propertyValue) {
         this._polyGraphicsList[index].getPolygon()[propertyName] = propertyValue;
     }
@@ -236,6 +249,11 @@ export class polygonManager {
         return this._polyGraphicsList.length;
     }
 
+    /**
+     * Apply transformation by setting the coordinates and clearing transformation properties.
+     * 
+     * Important: This operation may also lead to the update of the graphics.
+     */
     applyTransformation() {
         for (let i = 0; i < this._polyGraphicsList.length; i++) {
             this._polyGraphicsList[i].getPolygon().setTranslation([this._param[this.getParamIndex(i)], this._param[this.getParamIndex(i) + 1]]);
@@ -244,12 +262,22 @@ export class polygonManager {
         }
     }
 
+    /**
+     * Set the polygons to be fixed. These polygons will not be translated during the process.
+     * @param {number[]} fixedPolygons List of polygons to be fixed.
+     */
     setFix(fixedPolygons) {
         for (let i = 0; i < fixedPolygons.length; i++) {
             this.setPolygonProperty(fixedPolygons[i], '_translatable', false);
         }
     }
 
+    /**
+     * Call the optimization function defined in `diff_func.js`.
+     * 
+     * After the optimization, apply the transformation.
+     * @param {number} eta Learning rate.
+     */
     async optimize(eta) {
         this._param = await beginOptimization(this, eta);
         this.applyTransformation();

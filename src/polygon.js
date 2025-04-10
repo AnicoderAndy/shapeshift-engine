@@ -1,6 +1,5 @@
 //@ts-check
 /**
- * Warning: geometries in this file are not in the same coordinate system as pixijs.
  * Polygon class for creating and manipulating polygons,
  * providing operations like Minkowski sum, and SDF.
  * @author Qiu Jingye   <anicoder@outlook.com>
@@ -8,11 +7,6 @@
 
 import { cross, dot, vecAdd, vecMinus, sqr, isIntersectingLine } from './utilities'
 import ClipperLib from 'clipper-lib';
-
-const drawLine = (x1, y1, x2, y2, g, filling) => {
-    g.moveTo(x1, y1); g.lineTo(x2, y2);
-    g.stroke(filling);
-};
 
 /**
  * Symmetrically invert the points of a polygon about the origin
@@ -110,8 +104,6 @@ export class Polygon {
         // Number of points of this polygon
         /**@type {number} */
         this._n = vertexList.length;
-        // TODO: Check whether given points make a valid polygon.
-        // TODO: Check polygon is convex or not.
         // Vertices of this polygon (ensure CCW order)
         /**@type {[number, number][]} */
         this._vertexList = vertexList;
@@ -173,8 +165,6 @@ export class Polygon {
     /**
      * Return the SDF of a point X to a polygon.
      * Algorithm from the appendix of the paper "Minkowski Penalties"
-     * 
-     * TODO: This function has a correction multiplier '-1' to the result due to the inverted y-axis. Direct computation needed.
      * @param {[number, number]} X coordiate of X
      * @param {[number, number][]} points coordinates of the polygon
      * @returns {number} SDF value
@@ -219,11 +209,10 @@ export class Polygon {
     }
 
     /**
-     * 
-     * @param {*} vertices 
-     * @returns 
+     * Check if the polygon is simple.
+     * @param {[number, number][]} vertices Vertices of the polygon.
+     * @returns {boolean} Whether the polygon is simple.
      */
-    // Check if the polygon is simple
     static isSimplePolygon(vertices) {
         const n = vertices.length;
         for (let i = 0; i < n; i++) {

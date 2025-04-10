@@ -1,7 +1,6 @@
 import { Real, Vec, compile, fn, struct, vjp, add, mul, sub, sqrt, select, gt, lt, and, div, Bool, not, geq, neg, abs } from 'rose';
 import { polygonManager } from './polygon_manager';
 import { Polygon } from './polygon';
-import { Graphics } from 'pixi.js';
 
 const sqr = x => mul(x, x);
 const cross = (a, b) => sub(mul(a[0], b[1]), mul(a[1], b[0]));

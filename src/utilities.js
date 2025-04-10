@@ -1,6 +1,4 @@
 //@ts-check
-// Use `import { cross, dot, vecAdd, vecMinus, sqr, direction } from './utilities'` to import
-
 /**
  * 
  * @param {[number, number]} a 
@@ -97,12 +95,6 @@ export const compareDirection = (p, q) => {
     return c > 0 ? -1 : 1;
 }
 
-// console.log(compareDirection([1, 0], [0, 1])); // -1
-// console.log(compareDirection([0.5, 0.5], [-0.5, 0.5])); // -1
-// console.log(compareDirection([-0.5, 0.5], [0.5, 0.5])); // 1
-// console.log(compareDirection([0.5, 0.5], [0.5, -0.5])); // -1
-// console.log(compareDirection([0.5, 0.5], [0.5, 0.5])); // 0
-
 /**
  * Returns true iff d is not equal to d1, and while rotating 
  * counterclockwise starting at d1, d is reached strictly before d2 is reached. 
@@ -147,8 +139,14 @@ export const isIntersectingLine = (a, b, c, d) => {
     const o2 = orientation(a, b, d);
     const o3 = orientation(c, d, a);
     const o4 = orientation(c, d, b);
-    // Helper function to check if point q lies on line segment 'pr'
-    function onSegment(p, q, r) {
+    /**
+     * Helper function to check if point q lies on line segment 'pr'.
+     * @param {[number, number]} p
+     * @param {[number, number]} q
+     * @param {[number, number]} r
+     * @returns {boolean} Result
+     */
+    const onSegment = (p, q, r) => {
         return q[0] <= Math.max(p[0], r[0]) && q[0] >= Math.min(p[0], r[0]) &&
             q[1] <= Math.max(p[1], r[1]) && q[1] >= Math.min(p[1], r[1]);
     }
