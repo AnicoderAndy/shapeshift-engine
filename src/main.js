@@ -39,15 +39,22 @@ import { polygon2svg } from './polygon2svg.js';
 
     // Add event listeners to control buttons
     drawPolyBtn.addEventListener('click', polyManager.drawPolyHandler.bind(polyManager));
-    processBtn.addEventListener('click', async () => {
-        // Get Content in the input boxes
-        polyManager.updateRelation();
-
-        // Set fixed polygons
-        polyManager.setupFix();
-
-        // Start optimization process
-        await polyManager.optimize(1e-2);
+    processBtn.addEventListener('click', async (e) => {
+        try {
+            // Update button InnerHTML
+            e.target.innerHTML = 'Processing...';
+            // Get Content in the input boxes
+            polyManager.updateRelation();
+            // Set fixed polygons
+            polyManager.setupFix();
+            // Start optimization process
+            await polyManager.optimize(1e-2);
+            e.target.innerHTML = 'Process';
+        } catch (error) {
+            console.error('Error during processing:', error);
+            alert(`An error occurred during processing: ${error}`);
+            e.target.innerHTML = 'Process';
+        }
     });
 
     downloadSvgBtn.addEventListener('click', () => {
@@ -79,6 +86,7 @@ import { polygon2svg } from './polygon2svg.js';
             reader.readAsText(file);
         } catch (error) {
             console.error('Error importing JSON:', error);
+            alert(`An error occurred during importing JSON: ${error}`);
             return;
         }
     });

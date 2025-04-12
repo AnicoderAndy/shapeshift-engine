@@ -132,7 +132,7 @@ export class polygonManager {
      */
     canvasDrawPolygonHandler(e) {
         this._currentVertices.push([e.offsetX, -e.offsetY]);
-        console.log(e.offsetX, -e.offsetY);
+        console.log(`Drawing info: A point (${e.offsetX}, ${-e.offsetY}) is added to the polygon.`);
         if (this._currentVertices.length >= 2) {
             this._currentPolygonGraphics.setVertexList([...this._currentVertices]);
             this._app.stage.addChild(this._currentPolygonGraphics.getGraphics());
@@ -144,7 +144,7 @@ export class polygonManager {
         const button = e.currentTarget;
 
         button.textContent = this._drawingPolygon ? 'Drawing...Click again to confirm' : 'New Polygon';
-        console.log('Drawing: ', this._drawingPolygon);
+        console.log('Drawing info: drawing mode ==', this._drawingPolygon);
 
         if (this._drawingPolygon) {
             this._app.canvas.addEventListener('click', this._canvasDrawPolygonHandler);

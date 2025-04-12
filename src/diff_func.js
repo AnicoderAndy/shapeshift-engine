@@ -192,6 +192,9 @@ const optimization = async (optimizationParameters) => {
     let c = c0;
 
     for (let epoch = 0; epoch < 50; epoch++) {
+        if (epoch % 10 == 0) {
+            console.log(`Optimization info: ${epoch} / 50 epochs done.`);
+        }
         const f = fn([paramType], Real, (params) => add(epsilon(params), mul(c, squaredSumPenalty(params))));
         const h = fn([paramType], paramType, (params) => vjp(f)(params).grad(1));
         const grad = await compile(h);
@@ -207,13 +210,12 @@ const optimization = async (optimizationParameters) => {
 
         if (maxGrad < 1e-5) {
             console.log(`Converged in ${epoch} epochs.`);
-            console.log(params);
             return params;
         }
         c *= eta_c;
     }
     console.warn('Process warning: the optimization was not converged.');
-    console.log(params);
+    alert('Process warning: the optimization was not converged.\nChecking whether configuration is valid is suggested.')
     return params;
 };
 
