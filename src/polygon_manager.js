@@ -7,8 +7,7 @@ import { beginOptimization } from "./diff_func";
  * @typedef {Object} Relation
  * @property {[number, number][]} notOverlap
  * @property {[number, number][]} overlap
- * @property {[number, number][]} tangent
- * @property {[number, number][]} contain
+ * @property {number[]} fixed
  */
 
 function getRandomColor() {
@@ -40,10 +39,12 @@ export class polygonManager {
     /**
      * Create a polygonManager object.
      * @param {Application} app 
-     * @param {Element} uiPolyList
-     * @param {{randomColorInput: HTMLInputElement; polygonColorInput: HTMLInputElement;}} colorInput
+     * @param {Object} htmlElements
+     * @param {Element} htmlElements.uiPolyList
+     * @param {{randomColorInput: HTMLInputElement; polygonColorInput: HTMLInputElement;}} htmlElements.colorInput
+     * @param {{notOverlapInput: HTMLInputElement; overlapInput: HTMLInputElement; fixInput: HTMLInputElement;}} htmlElements.relationInput
      */
-    constructor(app, uiPolyList, colorInput) {
+    constructor(app, htmlElements) {
         // Pixijs application
         this._app = app;
         // List of managed polygons
@@ -51,7 +52,7 @@ export class polygonManager {
         this._polyGraphicsList = [];
         // Relations between polygons
         /**@type {Relation} */
-        this._relation = { notOverlap: [], overlap: [], tangent: [], contain: [] };
+        this._relation = { notOverlap: [], overlap: [], fixed: [] };
         // Parameters to be optimized
         this._param = [];
         // Number of parameters for each polygon
@@ -67,9 +68,11 @@ export class polygonManager {
         // Handler instance for canvasDrawPolygonHandler
         this._canvasDrawPolygonHandler = this.canvasDrawPolygonHandler.bind(this);
         // PolyList in index.html
-        this._uiPolyList = uiPolyList;
+        this._uiPolyList = htmlElements.uiPolyList;
         // Color Input controls
-        this._colorController = colorInput;
+        this._colorController = htmlElements.colorInput;
+        // Relation inputs
+        this._relationInput = htmlElements.relationInput;
     }
 
     getList() {
@@ -87,6 +90,21 @@ export class polygonManager {
         this._polyGraphicsList.push(pG);
         this._app.stage.addChild(pG.getGraphics());
         this._param.push(0, 0);
+
+        // Add the polygon to the uiList
+        let li = document.createElement('li');
+        const polygonIndex = this.size() - 1;
+        li.innerHTML = `Polygon ${polygonIndex}`;
+        this._uiPolyList.appendChild(li);
+        li.addEventListener('click', () => {
+            const graphicsRef = this._polyGraphicsList[polygonIndex].getGraphics();
+            const flicker = makeFlickerHandler(graphicsRef);
+            this._app.ticker.add(flicker);
+            setTimeout(() => {
+                this._app.ticker.remove(flicker);
+                graphicsRef.alpha = 1;
+            }, 250);
+        });
     }
 
     /**
@@ -102,10 +120,6 @@ export class polygonManager {
             this._relation.notOverlap.push([index1, index2]);
         } else if (relation == 1) {
             this._relation.overlap.push([index1, index2]);
-        } else if (relation == 2) {
-            this._relation.tangent.push([index1, index2]);
-        } else if (relation == 3) {
-            this._relation.contain.push([index1, index2]);
         } else {
             throw new Error("Invalid relation type.");
         }
@@ -135,26 +149,19 @@ export class polygonManager {
         if (this._drawingPolygon) {
             this._app.canvas.addEventListener('click', this._canvasDrawPolygonHandler);
         } else {
+            // Not enough vertices:
             if (this._currentVertices.length < 2) {
-                console.error("A polygon must have at least 2 vertices.");
-                alert("A polygon must have at least 2 vertices.");
-                this._currentVertices = [];
+                console.error('Invalid polygon detected: not enough vertices, at least 2 vertices are needed.');
+                alert('A polygon must have at least 2 vertices.');
+                this.clearCurrentPolygon();
                 return;
             }
 
-            // Check if the polygon is simple
-            if (!Polygon.isSimplePolygon(this._currentVertices)) {
-                console.error("The polygon is not simple (edges intersect). Please redraw.");
-                alert("The polygon is not simple (edges intersect). Please redraw.");
-
-                // remove the graphics from the stage
-                if (this._currentPolygonGraphics) {
-                    this._app.stage.removeChild(this._currentPolygonGraphics.getGraphics());
-                    this._currentPolygonGraphics.destroy();
-                    this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
-                }
-
-                this._currentVertices = [];
+            // Not Simple:
+            else if (!Polygon.isSimplePolygon(this._currentVertices)) {
+                console.error('Invalid polygon detected: edges intersect');
+                alert('The polygon is not simple (edges intersect). Please redraw.');
+                this.clearCurrentPolygon();
                 return;
             }
 
@@ -162,42 +169,26 @@ export class polygonManager {
             const newPoly = new Polygon([...this._currentVertices], color);
             this.pushPolygon(newPoly);
 
-            if (this._currentPolygonGraphics) {
-                this._currentPolygonGraphics.destroy();
-                this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
-                this._currentVertices = [];
-            }
-
+            this.clearCurrentPolygon();
             this._app.canvas.removeEventListener('click', this._canvasDrawPolygonHandler);
-
-            let li = document.createElement('li');
-            const polygonIndex = this.size() - 1;
-            li.innerHTML = `Polygon ${polygonIndex}`;
-            this._uiPolyList.appendChild(li);
-            li.addEventListener('click', () => {
-                const graphicsRef = this._polyGraphicsList[polygonIndex].getGraphics();
-                const flicker = makeFlickerHandler(graphicsRef);
-                this._app.ticker.add(flicker);
-                setTimeout(() => {
-                    this._app.ticker.remove(flicker);
-                    graphicsRef.alpha = 1;
-                }, 250);
-            });
         }
     }
 
-    /**
-     * Set relation and stores them in the manager. A relation is a list of pairs of polygon indices.
-     * @param {[number, number][]} notOverlap Relationships of not overlapping polygons
-     * @param {[number, number][]} overlap Relationships of overlapping polygons.
-     * @param {[number, number][]} tangent Relationships of tangenting polygons.
-     * @param {[number, number][]} contain Relationships of B containing A.
-     */
-    setRelation(notOverlap, overlap, tangent, contain) {
-        this._relation.notOverlap = notOverlap;
-        this._relation.overlap = overlap;
-        this._relation.tangent = tangent;
-        this._relation.contain = contain;
+    clearCurrentPolygon() {
+        // remove the graphics from the stage
+        if (this._currentPolygonGraphics) {
+            this._app.stage.removeChild(this._currentPolygonGraphics.getGraphics());
+            this._currentPolygonGraphics.destroy();
+            this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
+        }
+        this._currentVertices = [];
+    }
+
+    // Fetch relations from the HTMLInput elements
+    updateRelation() {
+        this._relation.notOverlap = eval(this._relationInput.notOverlapInput.value) ?? [];
+        this._relation.overlap = eval(this._relationInput.overlapInput.value) ?? [];
+        this._relation.fixed = eval(this._relationInput.fixInput.value) ?? [];
     }
 
     getRelation() {
@@ -263,13 +254,49 @@ export class polygonManager {
     }
 
     /**
-     * Set the polygons to be fixed. These polygons will not be translated during the process.
-     * @param {number[]} fixedPolygons List of polygons to be fixed.
+     * Clear the current context and load a context from JSON.
+     * @param {string} json Imported json string.
      */
-    setFix(fixedPolygons) {
-        for (let i = 0; i < fixedPolygons.length; i++) {
-            this.setPolygonProperty(fixedPolygons[i], '_translatable', false);
+    loadJson(json) {
+        /**@type {{ polygons: Polygon[], relations: Relation}} */
+        const data = JSON.parse(json);
+        this._polyGraphicsList = [];
+        this._relationInput.notOverlapInput.value = JSON.stringify(data.relations.notOverlap);
+        this._relationInput.overlapInput.value = JSON.stringify(data.relations.overlap);
+        this._relationInput.fixInput.value = JSON.stringify(data.relations.fixed);
+        this.clearCurrentPolygon();
+        this._param = [];
+        this._totParameter = 0;
+        this._app.stage.removeChildren();
+        this._uiPolyList.innerHTML = '';
+
+        for (let i = 0; i < data.polygons.length; i++) {
+            const poly = new Polygon(data.polygons[i]._vertexList, data.polygons[i]._filling);
+            this.pushPolygon(poly);
         }
+    }
+
+    exportToJson() {
+        const polygons = this._polyGraphicsList.map(p => p.getPolygon());
+        this.updateRelation();
+        const relations = this._relation;
+        return JSON.stringify({ polygons, relations });
+    }
+
+    /**
+     * Set the polygons to be fixed. These polygons will not be translated during the process.
+     */
+    setupFix() {
+        for (let i = 0; i < this._polyGraphicsList.length; i++) {
+            this.setPolygonProperty(i, '_translatable', true);
+        }
+        for (let i = 0; i < this._relation.fixed.length; i++) {
+            this.setPolygonProperty(this._relation.fixed[i], '_translatable', false);
+        }
+    }
+
+    getApp() {
+        return this._app;
     }
 
     /**

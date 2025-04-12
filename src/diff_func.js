@@ -123,6 +123,7 @@ const fnOverlap = (polyManager, index1, index2) => {
 
 /**
  * Return the squared penalty of the predicate that two polygons tangent.
+ * It will not work for unknown reason.
  * @param {polygonManager} polyManager 
  * @param {number} index1 Index of the first polygon involved in the relationship.
  * @param {number} index2 The second polygon index.
@@ -156,6 +157,7 @@ const fnTangent = (polyManager, index1, index2) => {
 
 /**
  * Return the squared penalty of the predicate that A contains B.
+ * Not implemented due to the complexity of the algorithm.
  * @param {polygonManager} polyManager 
  * @param {number} index1 Index of the first polygon involved in the relationship.
  * @param {number} index2 The second polygon index.
@@ -173,12 +175,6 @@ const buildRelation = (polyManager) => {
     }
     for (const [index1, index2] of polyManager.getRelation().overlap) {
         fnList.push(fnOverlap(polyManager, index1, index2));
-    }
-    for (const [index1, index2] of polyManager.getRelation().tangent) {
-        fnList.push(fnTangent(polyManager, index1, index2));
-    }
-    for (const [index1, index2] of polyManager.getRelation().contain) {
-        fnList.push(fnContain(polyManager, index1, index2));
     }
 
     const ret = fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
@@ -216,7 +212,7 @@ const optimization = async (optimizationParameters) => {
         }
         c *= eta_c;
     }
-    console.log('Not Converged!!!');
+    console.warn('Process warning: the optimization was not converged.');
     console.log(params);
     return params;
 };

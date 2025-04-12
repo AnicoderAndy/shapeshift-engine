@@ -15,8 +15,17 @@ import { polygon2svg } from './polygon2svg.js';
     // Get control buttons' elements
     const drawPolyBtn = document.querySelector('#btn-draw-poly');
     const downloadSvgBtn = document.querySelector('#btn-download-svg');
+    const downloadJsonBtn = document.querySelector('#btn-download-json');
+    const importJsonBtn = document.querySelector('#btn-import-json');
     const debugBtn = document.querySelector('#btn-debug');
     const processBtn = document.querySelector('#btn-process');
+
+    // Get input elements
+    const importJsonInput = document.querySelector('#input-import-json');
+    const notOverlapInput = document.querySelector('#input-not-overlap');
+    const overlapInput = document.querySelector('#input-overlap');
+    const fixInput = document.querySelector('#input-fix');
+    const relationInput = { notOverlapInput, overlapInput, fixInput };
 
     // Create a new application
     const app = new Application();
@@ -25,38 +34,67 @@ import { polygon2svg } from './polygon2svg.js';
     document.querySelector('#canvas').append(app.canvas);
 
     // Create a polygon manager
-    const polyManager = new polygonManager(app, uiPolyList, colorInput);
+    const htmlElements = { uiPolyList, colorInput, relationInput };
+    const polyManager = new polygonManager(app, htmlElements);
 
     // Add event listeners to control buttons
     drawPolyBtn.addEventListener('click', polyManager.drawPolyHandler.bind(polyManager));
     processBtn.addEventListener('click', async () => {
         // Get Content in the input boxes
-        const notOverlap = eval(document.querySelector('#input-not-overlap').value) ?? [];
-        const overlap = eval(document.querySelector('#input-overlap').value) ?? [];
-        const tangent = [];
-        const contain = [];
-        const fixedPolygons = eval(document.querySelector('#input-fix').value) ?? [];
-
-        // Add relations to the polygon manager
-        polyManager.setRelation(notOverlap, overlap, tangent, contain);
+        polyManager.updateRelation();
 
         // Set fixed polygons
-        polyManager.setFix(fixedPolygons);
+        polyManager.setupFix();
 
         // Start optimization process
         await polyManager.optimize(1e-2);
     });
 
-    downloadSvgBtn.addEventListener('click', async () => {
+    downloadSvgBtn.addEventListener('click', () => {
         const svg = polygon2svg(polyManager);
         const blob = new Blob([svg], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
-        const downloadLink = document.createElement('a');
-        downloadLink.href = url;
-        downloadLink.download = 'shapeshift-export.svg';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(url);
+        download(blob, 'shapeshift-export.svg');
+    });
+
+    downloadJsonBtn.addEventListener('click', () => {
+        const json = polyManager.exportToJson();
+        const blob = new Blob([json], { type: 'application/json' });
+        download(blob, 'shapeshift-saved.json');
+    });
+
+    importJsonBtn.addEventListener('click', () => {
+        if (!confirm('This operation will clear the canvas and all configurations. Are you sure to proceed?')) {
+            return;
+        }
+        try {
+            const file = importJsonInput.files[0];
+            if (!file) {
+                throw new Error('No file selected');
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                const json = e.target.result;
+                polyManager.loadJson(json);
+            }
+            reader.readAsText(file);
+        } catch (error) {
+            console.error('Error importing JSON:', error);
+            return;
+        }
+    });
+
+    debugBtn.addEventListener('click', () => {
+        console.log(polyManager.exportToJson());
     });
 })();
+
+function download(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
+}

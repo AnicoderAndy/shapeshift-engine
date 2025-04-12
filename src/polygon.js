@@ -114,14 +114,10 @@ export class Polygon {
 
         // Properties for whether allowed to transform
         this._translatable = true;
-        this._scalable = false;
-        this._rotatable = false;
 
         // Transformation properties
         /**@type {[number, number]} */
         this._translation = [0, 0];   // Translation
-        this._scale = [1., 1.];
-        this._rotation = 0; // In Radians
     }
 
     /**
