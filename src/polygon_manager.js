@@ -303,10 +303,10 @@ export class polygonManager {
      * Call the optimization function defined in `diff_func.js`.
      * 
      * After the optimization, apply the transformation.
-     * @param {number} eta Learning rate.
+     * @param {Object} options Learning rate.
      */
-    async optimize(eta) {
-        this._param = await beginOptimization(this, eta);
+    async optimize(options) {
+        this._param = await beginOptimization(this, options);
         this.applyTransformation();
     }
 }

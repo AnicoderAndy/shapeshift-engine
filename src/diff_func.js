@@ -1,4 +1,8 @@
-import { Real, Vec, compile, fn, struct, vjp, add, mul, sub, sqrt, select, gt, lt, and, div, Bool, not, geq, neg, abs } from 'rose';
+/**
+ * This file provieds differentiable functions and optimization function.
+ * @author Qiu Jingye <anicoder@outlook.com>
+ */
+import { Real, Vec, compile, fn, struct, vjp, add, mul, sub, sqrt, select, gt, lt, and, div, Bool, not, geq, neg, abs, vec } from 'rose';
 import { polygonManager } from './polygon_manager';
 import { Polygon } from './polygon';
 
@@ -12,14 +16,20 @@ const vecMinus = (a, b) => struct([sub(a[0], b[0]), sub(a[1], b[1])]);
 // Use this as a macro. Return whether a polygon is translatable(Boolean).
 const translatable = (polyManager, index) => polyManager.getList()[index].getPolygon().getTranslatable();
 
+const clamp = (num, lb, rb) => {
+    if (num < lb) return lb;
+    if (num > rb) return rb;
+    return num;
+}
+
 /**
  * Return a opaque function that computes sdf(0) of a polygon with n points and an offset.
  * 
  * Algorithm from the paper on which this project is based.
  * 
  * TODO: Optimize uu and vv computation
- * @param {number} n test
- * @returns {fn} Differentiable function
+ * @param {number} n Number of vertices of a polygon.
+ * @returns {import('rose').Fn} Differentiable function.
  */
 const sdf0_offset = (n) => fn([{ offset: Vec(2, Real), points: Vec(n, Vec(2, Real)) }], Real, ({ offset, points }) => {
     // sdf_offset(0) = sdf_original(-offset)
@@ -176,6 +186,7 @@ const buildRelation = (polyManager) => {
     for (const [index1, index2] of polyManager.getRelation().overlap) {
         fnList.push(fnOverlap(polyManager, index1, index2));
     }
+    // return fnList;
 
     const ret = fn([Vec(polyManager.getTotParameter(), Real)], Real, (params) => {
         let result = 0;
@@ -188,12 +199,15 @@ const buildRelation = (polyManager) => {
 };
 
 const optimization = async (optimizationParameters) => {
-    const { epsilon, squaredSumPenalty, params, paramType, eta, c0 = 1e-4, eta_c = 1.5 } = optimizationParameters;
+    const { epsilon, squaredSumPenalty, params, paramType, eta, c0 = 1e-4, eta_c = 1.5, maxIter = 50 } = optimizationParameters;
     let c = c0;
+    for (const key in params) {
+        params[key] = 0;
+    }
 
-    for (let epoch = 0; epoch < 50; epoch++) {
+    for (let epoch = 0; epoch < maxIter; epoch++) {
         if (epoch % 10 == 0) {
-            console.log(`Optimization info: ${epoch} / 50 epochs done.`);
+            console.log(`Optimization info: ${epoch} / ${maxIter} epochs done.`);
         }
         const f = fn([paramType], Real, (params) => add(epsilon(params), mul(c, squaredSumPenalty(params))));
         const h = fn([paramType], paramType, (params) => vjp(f)(params).grad(1));
@@ -204,29 +218,35 @@ const optimization = async (optimizationParameters) => {
 
         // Iterate through params, generate newParams
         for (const key in params) {
+            gradVal[key] = clamp(gradVal[key], -200, 200);
             params[key] -= eta * (gradVal[key] ?? 0);
             maxGrad = Math.max(maxGrad, Math.abs(gradVal[key] ?? 0));
         }
 
         if (maxGrad < 1e-5) {
             console.log(`Converged in ${epoch} epochs.`);
+            console.log(params);
             return params;
         }
         c *= eta_c;
     }
     console.warn('Process warning: the optimization was not converged.');
     alert('Process warning: the optimization was not converged.\nChecking whether configuration is valid is suggested.')
+    console.log(params);
     return params;
 };
 
-export const beginOptimization = async (polyManager, eta) => {
+export const beginOptimization = async (polyManager, optimizeOptions) => {
     const paramType = Vec(polyManager.getTotParameter(), Real);
     const optParameters = {
         paramType: paramType,
         epsilon: fn([paramType], Real, () => 0),
         squaredSumPenalty: buildRelation(polyManager),
         params: polyManager._param,
-        eta: eta
+        eta: optimizeOptions.eta,
+        c0: optimizeOptions.c0,
+        eta_c: optimizeOptions.eta_c,
+        maxIter: optimizeOptions.maxIter
     };
     return await optimization(optParameters);
 };

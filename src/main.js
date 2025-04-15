@@ -48,7 +48,7 @@ import { polygon2svg } from './polygon2svg.js';
             // Set fixed polygons
             polyManager.setupFix();
             // Start optimization process
-            await polyManager.optimize(1e-2);
+            await polyManager.optimize({ eta: 0.01, c0: 1e-3, eta_c: 1.4, maxIter: 100 });
             e.target.innerHTML = 'Process';
         } catch (error) {
             console.error('Error during processing:', error);
