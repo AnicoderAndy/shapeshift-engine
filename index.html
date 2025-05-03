@@ -20,22 +20,34 @@
       Polygon Color: <input type="color" id="input-polygon-color" value="#ff0000"> or <input type="checkbox"
         id="input-polygon-random-color" checked>Random Color
       <button id="btn-draw-poly" class="btn-control">New Polygon</button>
+      <hr class="controls">
+      Enter Text:
+      <input type="text" id="input-text" class="input-relation" placeholder="Enter text here..." />
+      Font size:
+      <input type="text" id="input-font-size" class="input-relation" value="16">
+      Font family:
+      <input type="text" id="input-font-family" class="input-relation" value="SimSun">
+      <button id="btn-new-text" class="btn-control">New Text</button>
+      <hr class="controls">
       <input type="file" id="input-import-json" class="btn-control" accept=".json" />
       <button id="btn-import-json" class="btn-control">Import JSON</button>
+      <hr class="controls">
       Click the list item to highlight the polygon on the canvas:
       <ul id="list-polygons"></ul>
 
+      <hr class="controls">
       Do not overlap:
       <input type="text" id="input-not-overlap" placeholder="[[0, 1], [1, 2]]" class="input-relation" />
       Overlap:
       <input type="text" id="input-overlap" placeholder="[[0, 1], [1, 2]]" class="input-relation" />
       Fix:
       <input type="text" id="input-fix" placeholder="[0, 1, 2]" class="input-relation" />
+      <hr class="controls">
 
       <button id="btn-process" class="btn-control">Process</button>
       <button id="btn-download-svg" class="btn-control">Download SVG</button>
       <button id="btn-download-json" class="btn-control">Download JSON</button>
-      <button id="btn-debug" class="btn-control" style="display: none;">Debug</button>
+      <button id="btn-debug" class="btn-control" style="display: block;">Debug</button>
     </div>
   </div>
   <script type="module" src="/src/main.js"></script>

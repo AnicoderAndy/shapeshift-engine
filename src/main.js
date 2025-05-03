@@ -1,19 +1,21 @@
-import { Application } from 'pixi.js';
+import { Application, Text } from 'pixi.js';
 import { polygonManager } from './polygon_manager.js';
 import { polygon2svg } from './polygon2svg.js';
-
 
 (async () => {
     // Get polygon list element
     const uiPolyList = document.querySelector('#list-polygons');
 
     // Get color control elements
-    const randomColorInput = document.querySelector('#input-polygon-random-color');
+    const randomColorInput = document.querySelector(
+        '#input-polygon-random-color'
+    );
     const polygonColorInput = document.querySelector('#input-polygon-color');
     const colorInput = { randomColorInput, polygonColorInput };
 
     // Get control buttons' elements
     const drawPolyBtn = document.querySelector('#btn-draw-poly');
+    const newTextBtn = document.querySelector('#btn-new-text');
     const downloadSvgBtn = document.querySelector('#btn-download-svg');
     const downloadJsonBtn = document.querySelector('#btn-download-json');
     const importJsonBtn = document.querySelector('#btn-import-json');
@@ -21,6 +23,9 @@ import { polygon2svg } from './polygon2svg.js';
     const processBtn = document.querySelector('#btn-process');
 
     // Get input elements
+    const textInput = document.querySelector('#input-text');
+    const fontSizeInput = document.querySelector('#input-font-size');
+    const fontFamilyInput = document.querySelector('#input-font-family');
     const importJsonInput = document.querySelector('#input-import-json');
     const notOverlapInput = document.querySelector('#input-not-overlap');
     const overlapInput = document.querySelector('#input-overlap');
@@ -34,11 +39,25 @@ import { polygon2svg } from './polygon2svg.js';
     document.querySelector('#canvas').append(app.canvas);
 
     // Create a polygon manager
-    const htmlElements = { uiPolyList, colorInput, relationInput };
+    const htmlElements = {
+        uiPolyList,
+        colorInput,
+        relationInput,
+        textInput,
+        fontSizeInput,
+        fontFamilyInput,
+    };
     const polyManager = new polygonManager(app, htmlElements);
 
     // Add event listeners to control buttons
-    drawPolyBtn.addEventListener('click', polyManager.drawPolyHandler.bind(polyManager));
+    drawPolyBtn.addEventListener(
+        'click',
+        polyManager.drawPolyHandler.bind(polyManager)
+    );
+    newTextBtn.addEventListener(
+        'click',
+        polyManager.newTextHandler.bind(polyManager)
+    );
     processBtn.addEventListener('click', async (e) => {
         try {
             // Update button InnerHTML
@@ -48,7 +67,12 @@ import { polygon2svg } from './polygon2svg.js';
             // Set fixed polygons
             polyManager.setupFix();
             // Start optimization process
-            await polyManager.optimize({ eta: 0.01, c0: 1e-3, eta_c: 2, maxIter: 100 });
+            await polyManager.optimize({
+                eta: 0.01,
+                c0: 1e-3,
+                eta_c: 2,
+                maxIter: 100,
+            });
             e.target.innerHTML = 'Process';
         } catch (error) {
             console.error('Error during processing:', error);
@@ -70,7 +94,11 @@ import { polygon2svg } from './polygon2svg.js';
     });
 
     importJsonBtn.addEventListener('click', () => {
-        if (!confirm('This operation will clear the canvas and all configurations. Are you sure to proceed?')) {
+        if (
+            !confirm(
+                'This operation will clear the canvas and all configurations. Are you sure to proceed?'
+            )
+        ) {
             return;
         }
         try {
@@ -79,10 +107,10 @@ import { polygon2svg } from './polygon2svg.js';
                 throw new Error('No file selected');
             }
             const reader = new FileReader();
-            reader.onload = e => {
+            reader.onload = (e) => {
                 const json = e.target.result;
                 polyManager.loadJson(json);
-            }
+            };
             reader.readAsText(file);
         } catch (error) {
             console.error('Error importing JSON:', error);
@@ -91,9 +119,7 @@ import { polygon2svg } from './polygon2svg.js';
         }
     });
 
-    debugBtn.addEventListener('click', () => {
-        console.log(polyManager.exportToJson());
-    });
+    debugBtn.addEventListener('click', () => {});
 })();
 
 function download(blob, filename) {

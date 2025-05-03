@@ -5,7 +5,14 @@
  * @author Qiu Jingye   <anicoder@outlook.com>
  */
 
-import { cross, dot, vecAdd, vecMinus, sqr, isIntersectingLine } from './utilities'
+import {
+    cross,
+    dot,
+    vecAdd,
+    vecMinus,
+    sqr,
+    isIntersectingLine,
+} from './utilities';
 import ClipperLib from 'clipper-lib';
 
 /**
@@ -69,12 +76,16 @@ function convexMinkowskiSum(pointsA, pointsB) {
         // Find the down-left-most point
         let pos = 0;
         for (let i = 1; i < points.length; i++) {
-            if (points[i][1] < points[pos][1] || (points[i][1] === points[pos][1] && points[i][0] < points[pos][0])) {
+            if (
+                points[i][1] < points[pos][1] ||
+                (points[i][1] === points[pos][1] &&
+                    points[i][0] < points[pos][0])
+            ) {
                 pos = i;
             }
         }
         return points.slice(pos).concat(points.slice(0, pos));
-    }
+    };
 
     let a = reorder(pointsA);
     let b = reorder(pointsB);
@@ -100,10 +111,22 @@ function convexMinkowskiSum(pointsA, pointsB) {
 }
 
 export class Polygon {
-    constructor(vertexList, filling) {
+    /**
+     * @typedef {Object} TextInfo
+     * @property {String} textString
+     * @property {Number} fontSize
+     * @property {String} fontFamily
+     */
+    /**
+     * @param {[number, number][]} vertexList
+     * @param {string} filling
+     * @param {TextInfo | null} text
+     */
+    constructor(vertexList, filling, text = null) {
         // Number of points of this polygon
         /**@type {number} */
         this._n = vertexList.length;
+        this._text = text;
         // Vertices of this polygon (ensure CCW order)
         /**@type {[number, number][]} */
         this._vertexList = vertexList;
@@ -117,7 +140,7 @@ export class Polygon {
 
         // Transformation properties
         /**@type {[number, number]} */
-        this._translation = [0, 0];   // Translation
+        this._translation = [0, 0]; // Translation
     }
 
     /**
@@ -181,13 +204,13 @@ export class Polygon {
                 let dd = sqr(cross(u, v)) / z;
                 if (dd < d) {
                     if (dd < d) {
-                        d = dd, j = i, e = true;
+                        (d = dd), (j = i), (e = true);
                     }
                 }
             } else {
                 let dd = dot(u, u);
                 if (dd < d) {
-                    d = dd, s = 1, e = false;
+                    (d = dd), (s = 1), (e = false);
                     if (cross(v0, v) < 0) {
                         s = -1;
                     }
@@ -215,7 +238,14 @@ export class Polygon {
             for (let j = i + 1; j < n; j++) {
                 // Skip adjacent edges and the same edge
                 if (Math.abs(i - j) === 1 || (i === 0 && j === n - 1)) continue;
-                if (isIntersectingLine(vertices[i], vertices[(i + 1) % n], vertices[j], vertices[(j + 1) % n])) {
+                if (
+                    isIntersectingLine(
+                        vertices[i],
+                        vertices[(i + 1) % n],
+                        vertices[j],
+                        vertices[(j + 1) % n]
+                    )
+                ) {
                     return false;
                 }
             }
@@ -274,5 +304,9 @@ export class Polygon {
 
     getTranslatable() {
         return this._translatable;
+    }
+
+    getText() {
+        return this._text;
     }
 }

@@ -1,8 +1,9 @@
 //@ts-check
-import { Polygon } from "./polygon";
-import { Application, Graphics, Ticker } from "pixi.js";
-import { polygonGraphics } from "./polygon_graphics";
-import { beginOptimization } from "./diff_func";
+import { Polygon } from './polygon';
+import { Application, Graphics, Text } from 'pixi.js';
+import { polygonGraphics } from './polygon_graphics';
+import { beginOptimization } from './diff_func';
+
 /**
  * @typedef {Object} Relation
  * @property {[number, number][]} notOverlap
@@ -11,8 +12,8 @@ import { beginOptimization } from "./diff_func";
  */
 
 function getRandomColor() {
-    const letters = "0123456789ABCDEF";
-    let color = "";
+    const letters = '0123456789ABCDEF';
+    let color = '';
     for (let i = 0; i < 6; i++) {
         color += letters[Math.floor(Math.random() * 16)];
     }
@@ -21,7 +22,7 @@ function getRandomColor() {
 
 /**
  * Generate a flicker handler for a specific Graphics object.
- * @param {Graphics} graphicsRef The Graphics object to flicker.
+ * @param {Graphics | Text} graphicsRef The Graphics object to flicker.
  * @returns {import("pixi.js").TickerCallback<any>} The flicker handler function.
  */
 function makeFlickerHandler(graphicsRef) {
@@ -37,12 +38,18 @@ function makeFlickerHandler(graphicsRef) {
 
 export class polygonManager {
     /**
+     * @typedef {Object} ControlElements
+     * @property {Element} uiPolyList
+     * @property {HTMLInputElement} textInput
+     * @property {HTMLInputElement} fontFamilyInput
+     * @property {HTMLInputElement} fontSizeInput
+     * @property {{randomColorInput: HTMLInputElement; polygonColorInput: HTMLInputElement;}} colorInput
+     * @property {{notOverlapInput: HTMLInputElement; overlapInput: HTMLInputElement; fixInput: HTMLInputElement;}} relationInput
+     */
+    /**
      * Create a polygonManager object.
-     * @param {Application} app 
-     * @param {Object} htmlElements
-     * @param {Element} htmlElements.uiPolyList
-     * @param {{randomColorInput: HTMLInputElement; polygonColorInput: HTMLInputElement;}} htmlElements.colorInput
-     * @param {{notOverlapInput: HTMLInputElement; overlapInput: HTMLInputElement; fixInput: HTMLInputElement;}} htmlElements.relationInput
+     * @param {Application} app
+     * @param {ControlElements} htmlElements
      */
     constructor(app, htmlElements) {
         // Pixijs application
@@ -64,15 +71,23 @@ export class polygonManager {
         // List of the polygon vertices currently being drawn
         this._currentVertices = [];
         // Current polygonGraphics object
-        this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
+        this._currentPolygonGraphics = new polygonGraphics(
+            new Polygon([], 'red'),
+            false
+        );
         // Handler instance for canvasDrawPolygonHandler
-        this._canvasDrawPolygonHandler = this.canvasDrawPolygonHandler.bind(this);
+        this._canvasDrawPolygonHandler =
+            this.canvasDrawPolygonHandler.bind(this);
         // PolyList in index.html
         this._uiPolyList = htmlElements.uiPolyList;
         // Color Input controls
         this._colorController = htmlElements.colorInput;
         // Relation inputs
         this._relationInput = htmlElements.relationInput;
+        // Text inputs
+        this._textInput = htmlElements.textInput;
+        this._fontSizeInput = htmlElements.fontSizeInput;
+        this._fontFamilyInput = htmlElements.fontFamilyInput;
     }
 
     getList() {
@@ -83,10 +98,10 @@ export class polygonManager {
      * Create graphics for a polygon.
      * Add both the polygon and the graphics to the manager.
      * Display the polygon on the screen.
-     * @param {Polygon} poly to be added. 
+     * @param {Polygon} poly to be added.
      */
     pushPolygon(poly) {
-        const pG = new polygonGraphics(poly);
+        const pG = new polygonGraphics(poly, false);
         this._polyGraphicsList.push(pG);
         this._app.stage.addChild(pG.getGraphics());
         this._param.push(0, 0);
@@ -97,7 +112,71 @@ export class polygonManager {
         li.innerHTML = `Polygon ${polygonIndex}`;
         this._uiPolyList.appendChild(li);
         li.addEventListener('click', () => {
-            const graphicsRef = this._polyGraphicsList[polygonIndex].getGraphics();
+            const graphicsRef =
+                this._polyGraphicsList[polygonIndex].getGraphics();
+            const flicker = makeFlickerHandler(graphicsRef);
+            this._app.ticker.add(flicker);
+            setTimeout(() => {
+                this._app.ticker.remove(flicker);
+                graphicsRef.alpha = 1;
+            }, 250);
+        });
+    }
+
+    /**
+     * @typedef {Object} TextOptions
+     * @property {[number, number]} [position] - The position of the text.
+     * @property {number} [size] - The size of the text.
+     * @property {string} [fontFamily] - The font family of the text.
+     */
+    /**
+     * Add a text to the canvas.
+     * @param {String} text The textString to be added to the canvas.
+     * @param {TextOptions} [options]
+     */
+    pushText(text, options = {}) {
+        const {
+            position = [500, -400],
+            size = 16,
+            fontFamily = 'Arial',
+        } = options;
+
+        const x = position[0];
+        const y = position[1];
+        const pixiTextObject = new Text({
+            text,
+            x,
+            y: -y,
+            style: {
+                fontSize: size,
+                fontFamily: fontFamily,
+            },
+        });
+        const bounds = pixiTextObject.bounds;
+        const xOff = bounds.maxX - bounds.minX;
+        const yOff = bounds.maxY - bounds.minY;
+        const newPoly = new Polygon(
+            [
+                [x, y],
+                [x, y - yOff],
+                [x + xOff, y - yOff],
+                [x + xOff, y],
+            ],
+            'yellow',
+            { textString: text, fontFamily, fontSize: size }
+        );
+        const pG = new polygonGraphics(newPoly, true, pixiTextObject);
+        this._polyGraphicsList.push(pG);
+        this._app.stage.addChild(pixiTextObject);
+        this._param.push(0, 0);
+
+        let li = document.createElement('li');
+        const polygonIndex = this.size() - 1;
+        li.innerHTML = `Text ${polygonIndex}`;
+        this._uiPolyList.appendChild(li);
+        li.addEventListener('click', () => {
+            const graphicsRef =
+                this._polyGraphicsList[polygonIndex].getTextObject();
             const flicker = makeFlickerHandler(graphicsRef);
             this._app.ticker.add(flicker);
             setTimeout(() => {
@@ -109,7 +188,7 @@ export class polygonManager {
 
     /**
      * Add a constraint relation to the polygon manager.
-     * 
+     *
      * TODO: Check validity of the relation and the index
      * @param {number} relation 0-notOverlap, 1-overlap, 2-tangent, 3-contain
      * @param {number} index1 index of the first polygon
@@ -121,21 +200,29 @@ export class polygonManager {
         } else if (relation == 1) {
             this._relation.overlap.push([index1, index2]);
         } else {
-            throw new Error("Invalid relation type.");
+            throw new Error('Invalid relation type.');
         }
     }
 
     /**
      * Handler for the canvas object to obtain user's clicking position,
      * and pushing the offset to the current vertices list.
-     * @param {MouseEvent} e 
+     * @param {MouseEvent} e
      */
     canvasDrawPolygonHandler(e) {
         this._currentVertices.push([e.offsetX, -e.offsetY]);
-        console.log(`Drawing info: A point (${e.offsetX}, ${-e.offsetY}) is added to the polygon.`);
+        console.log(
+            `Drawing info: A point (${
+                e.offsetX
+            }, ${-e.offsetY}) is added to the polygon.`
+        );
         if (this._currentVertices.length >= 2) {
-            this._currentPolygonGraphics.setVertexList([...this._currentVertices]);
-            this._app.stage.addChild(this._currentPolygonGraphics.getGraphics());
+            this._currentPolygonGraphics.setVertexList([
+                ...this._currentVertices,
+            ]);
+            this._app.stage.addChild(
+                this._currentPolygonGraphics.getGraphics()
+            );
         }
     }
 
@@ -143,15 +230,22 @@ export class polygonManager {
         this._drawingPolygon = !this._drawingPolygon;
         const button = e.currentTarget;
 
-        button.textContent = this._drawingPolygon ? 'Drawing...Click again to confirm' : 'New Polygon';
+        button.textContent = this._drawingPolygon
+            ? 'Drawing...Click again to confirm'
+            : 'New Polygon';
         console.log('Drawing info: drawing mode ==', this._drawingPolygon);
 
         if (this._drawingPolygon) {
-            this._app.canvas.addEventListener('click', this._canvasDrawPolygonHandler);
+            this._app.canvas.addEventListener(
+                'click',
+                this._canvasDrawPolygonHandler
+            );
         } else {
             // Not enough vertices:
             if (this._currentVertices.length < 2) {
-                console.error('Invalid polygon detected: not enough vertices, at least 2 vertices are needed.');
+                console.error(
+                    'Invalid polygon detected: not enough vertices, at least 2 vertices are needed.'
+                );
                 alert('A polygon must have at least 2 vertices.');
                 this.clearCurrentPolygon();
                 return;
@@ -160,34 +254,58 @@ export class polygonManager {
             // Not Simple:
             else if (!Polygon.isSimplePolygon(this._currentVertices)) {
                 console.error('Invalid polygon detected: edges intersect');
-                alert('The polygon is not simple (edges intersect). Please redraw.');
+                alert(
+                    'The polygon is not simple (edges intersect). Please redraw.'
+                );
                 this.clearCurrentPolygon();
                 return;
             }
 
-            const color = this._colorController.randomColorInput.checked ? getRandomColor() : this._colorController.polygonColorInput.value;
+            const color = this._colorController.randomColorInput.checked
+                ? getRandomColor()
+                : this._colorController.polygonColorInput.value;
             const newPoly = new Polygon([...this._currentVertices], color);
             this.pushPolygon(newPoly);
 
             this.clearCurrentPolygon();
-            this._app.canvas.removeEventListener('click', this._canvasDrawPolygonHandler);
+            this._app.canvas.removeEventListener(
+                'click',
+                this._canvasDrawPolygonHandler
+            );
         }
+    }
+
+    newTextHandler(e) {
+        const textString = this._textInput.value;
+        const fontFamily = this._fontFamilyInput.value;
+        const fontSize = Number(this._fontSizeInput.value);
+        this._textInput.value = '';
+
+        this.pushText(textString, { fontFamily, size: fontSize });
+        console.log('Text info: A text object has been successfully added.');
     }
 
     clearCurrentPolygon() {
         // remove the graphics from the stage
         if (this._currentPolygonGraphics) {
-            this._app.stage.removeChild(this._currentPolygonGraphics.getGraphics());
+            this._app.stage.removeChild(
+                this._currentPolygonGraphics.getGraphics()
+            );
             this._currentPolygonGraphics.destroy();
-            this._currentPolygonGraphics = new polygonGraphics(new Polygon([], 'red'));
+            this._currentPolygonGraphics = new polygonGraphics(
+                new Polygon([], 'red'),
+                false
+            );
         }
         this._currentVertices = [];
     }
 
     // Fetch relations from the HTMLInput elements
     updateRelation() {
-        this._relation.notOverlap = eval(this._relationInput.notOverlapInput.value) ?? [];
-        this._relation.overlap = eval(this._relationInput.overlapInput.value) ?? [];
+        this._relation.notOverlap =
+            eval(this._relationInput.notOverlapInput.value) ?? [];
+        this._relation.overlap =
+            eval(this._relationInput.overlapInput.value) ?? [];
         this._relation.fixed = eval(this._relationInput.fixInput.value) ?? [];
     }
 
@@ -229,7 +347,8 @@ export class polygonManager {
      * @param {any} propertyValue Property value.
      */
     setPolygonProperty(index, propertyName, propertyValue) {
-        this._polyGraphicsList[index].getPolygon()[propertyName] = propertyValue;
+        this._polyGraphicsList[index].getPolygon()[propertyName] =
+            propertyValue;
     }
 
     /**
@@ -242,14 +361,32 @@ export class polygonManager {
 
     /**
      * Apply transformation by setting the coordinates and clearing transformation properties.
-     * 
+     *
      * Important: This operation may also lead to the update of the graphics.
      */
     applyTransformation() {
         for (let i = 0; i < this._polyGraphicsList.length; i++) {
-            this._polyGraphicsList[i].getPolygon().setTranslation([this._param[this.getParamIndex(i)], this._param[this.getParamIndex(i) + 1]]);
+            this._polyGraphicsList[i]
+                .getPolygon()
+                .setTranslation([
+                    this._param[this.getParamIndex(i)],
+                    this._param[this.getParamIndex(i) + 1],
+                ]);
             this._polyGraphicsList[i].getPolygon().applyTransformation();
-            this._polyGraphicsList[i].setupGraphics();
+            if (!this._polyGraphicsList[i]._isText) {
+                this._polyGraphicsList[i].setupGraphics();
+            } else {
+                this._polyGraphicsList[i]
+                    .getTextObject()
+                    .position.set(
+                        this._polyGraphicsList[i]
+                            .getPolygon()
+                            .getPoints()[0][0],
+                        -this._polyGraphicsList[i]
+                            .getPolygon()
+                            .getPoints()[0][1]
+                    );
+            }
         }
     }
 
@@ -261,9 +398,15 @@ export class polygonManager {
         /**@type {{ polygons: Polygon[], relations: Relation}} */
         const data = JSON.parse(json);
         this._polyGraphicsList = [];
-        this._relationInput.notOverlapInput.value = JSON.stringify(data.relations.notOverlap);
-        this._relationInput.overlapInput.value = JSON.stringify(data.relations.overlap);
-        this._relationInput.fixInput.value = JSON.stringify(data.relations.fixed);
+        this._relationInput.notOverlapInput.value = JSON.stringify(
+            data.relations.notOverlap
+        );
+        this._relationInput.overlapInput.value = JSON.stringify(
+            data.relations.overlap
+        );
+        this._relationInput.fixInput.value = JSON.stringify(
+            data.relations.fixed
+        );
         this.clearCurrentPolygon();
         this._param = [];
         this._totParameter = 0;
@@ -271,13 +414,27 @@ export class polygonManager {
         this._uiPolyList.innerHTML = '';
 
         for (let i = 0; i < data.polygons.length; i++) {
-            const poly = new Polygon(data.polygons[i]._vertexList, data.polygons[i]._filling);
-            this.pushPolygon(poly);
+            if (!data.polygons[i]._text) {
+                const poly = new Polygon(
+                    data.polygons[i]._vertexList,
+                    data.polygons[i]._filling
+                );
+                this.pushPolygon(poly);
+            } else {
+                this.pushText(
+                    /** @type {String}*/ (data.polygons[i]._text?.textString),
+                    {
+                        position: data.polygons[i]._vertexList[0],
+                        fontFamily: data.polygons[i]._text?.fontFamily,
+                        size: data.polygons[i]._text?.fontSize,
+                    }
+                );
+            }
         }
     }
 
     exportToJson() {
-        const polygons = this._polyGraphicsList.map(p => p.getPolygon());
+        const polygons = this._polyGraphicsList.map((p) => p.getPolygon());
         this.updateRelation();
         const relations = this._relation;
         return JSON.stringify({ polygons, relations });
@@ -291,7 +448,11 @@ export class polygonManager {
             this.setPolygonProperty(i, '_translatable', true);
         }
         for (let i = 0; i < this._relation.fixed.length; i++) {
-            this.setPolygonProperty(this._relation.fixed[i], '_translatable', false);
+            this.setPolygonProperty(
+                this._relation.fixed[i],
+                '_translatable',
+                false
+            );
         }
     }
 
@@ -301,7 +462,7 @@ export class polygonManager {
 
     /**
      * Call the optimization function defined in `diff_func.js`.
-     * 
+     *
      * After the optimization, apply the transformation.
      * @param {Object} options Learning rate.
      */

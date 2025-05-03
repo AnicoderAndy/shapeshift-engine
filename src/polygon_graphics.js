@@ -4,8 +4,8 @@
  * @author Qiu Jingye <anicoder@outlook.com>
  */
 
-import { Graphics } from "pixi.js";
-import { Polygon } from "./polygon";
+import { Graphics, Text } from 'pixi.js';
+import { Polygon } from './polygon';
 
 /**
  * @param {Polygon} polygon
@@ -22,14 +22,14 @@ function convertToPixiPoints(polygon) {
 
 /**
  * Draw a line in graphics.
- * @param {number} x1 
- * @param {number} y1 
- * @param {number} x2 
- * @param {number} y2 
- * @param {Graphics} graphics 
- * @param {string} filling 
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {Graphics} graphics
+ * @param {string} filling
  */
-function line(x1, y1 ,x2, y2, graphics, filling) {
+function line(x1, y1, x2, y2, graphics, filling) {
     graphics.moveTo(x1, y1);
     graphics.lineTo(x2, y2);
     graphics.stroke(filling);
@@ -38,27 +38,45 @@ function line(x1, y1 ,x2, y2, graphics, filling) {
 export class polygonGraphics {
     /**
      * @param {Polygon} polygon
+     * @param {Boolean} isText
+     * @param {Text | null} textObject
      */
-    constructor(polygon) {
+    constructor(polygon, isText, textObject = null) {
         // Polygon object
         this._polygon = polygon;
+        this._isText = isText;
         // Graphics object
-        this._graphics = new Graphics();
+        if (!isText) {
+            this._graphics = new Graphics();
+        } else {
+            this._textObject = textObject;
+        }
         // Setup graphics
         this.setupGraphics();
     }
 
     setupGraphics() {
-        this._graphics.clear();
-        if (this._polygon.getN() == 2) {
-            const x1 = this._polygon._vertexList[0][0];
-            const y1 = -this._polygon._vertexList[0][1];    // note: inverted y-axis
-            const x2 = this._polygon._vertexList[1][0];
-            const y2 = -this._polygon._vertexList[1][1];
-            line(x1, y1, x2, y2, this._graphics, this._polygon.getFilling());
+        if (!this._isText && this._graphics) {
+            this._graphics.clear();
+            if (this._polygon.getN() == 2) {
+                const x1 = this._polygon._vertexList[0][0];
+                const y1 = -this._polygon._vertexList[0][1]; // note: inverted y-axis
+                const x2 = this._polygon._vertexList[1][0];
+                const y2 = -this._polygon._vertexList[1][1];
+                line(
+                    x1,
+                    y1,
+                    x2,
+                    y2,
+                    this._graphics,
+                    this._polygon.getFilling()
+                );
+            }
+            this._graphics.poly(convertToPixiPoints(this._polygon));
+            this._graphics.fill(this._polygon.getFilling());
+        } else if (this._isText && this._textObject) {
+            return;
         }
-        this._graphics.poly(convertToPixiPoints(this._polygon));
-        this._graphics.fill(this._polygon.getFilling());
     }
 
     setVertexList(vertexList) {
@@ -70,11 +88,24 @@ export class polygonGraphics {
         return this._polygon;
     }
 
+    /**@returns {Graphics} */
     getGraphics() {
-        return this._graphics;
+        return /**@type {Graphics} */ (this._graphics);
+    }
+
+    /**@returns {Text} */
+    getTextObject() {
+        return /**@type {Text} */ (this._textObject);
     }
 
     destroy() {
-        this._graphics.destroy();
+        if (this._graphics) {
+            this._graphics.destroy();
+            this._graphics = undefined;
+        }
+        if (this._textObject) {
+            this._textObject.destroy();
+            this._textObject = undefined;
+        }
     }
 }
