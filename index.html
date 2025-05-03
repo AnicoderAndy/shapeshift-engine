@@ -15,39 +15,38 @@
 
 <body>
   <div style="display: flex; height: 100vh;">
-    <div id="canvas" style="flex: 7; background-color: #f0f0f0;"></div>
-    <div style="flex: 3; background: rgba(0, 0, 0, 0.5); padding: 10px;">
+    <div id="div-canvas" class="application"></div>
+    <div id="div-controls">
       Polygon Color: <input type="color" id="input-polygon-color" value="#ff0000"> or <input type="checkbox"
         id="input-polygon-random-color" checked>Random Color
       <button id="btn-draw-poly" class="btn-control">New Polygon</button>
       <hr class="controls">
       Enter Text:
-      <input type="text" id="input-text" class="input-relation" placeholder="Enter text here..." />
+      <input type="text" id="input-text" class="input-control" placeholder="Enter text here..." />
       Font size:
-      <input type="text" id="input-font-size" class="input-relation" value="16">
+      <input type="text" id="input-font-size" class="input-control" value="16">
       Font family:
-      <input type="text" id="input-font-family" class="input-relation" value="SimSun">
+      <input type="text" id="input-font-family" class="input-control" value="SimSun">
       <button id="btn-new-text" class="btn-control">New Text</button>
-      <hr class="controls">
-      <input type="file" id="input-import-json" class="btn-control" accept=".json" />
-      <button id="btn-import-json" class="btn-control">Import JSON</button>
       <hr class="controls">
       Click the list item to highlight the polygon on the canvas:
       <ul id="list-polygons"></ul>
 
       <hr class="controls">
       Do not overlap:
-      <input type="text" id="input-not-overlap" placeholder="[[0, 1], [1, 2]]" class="input-relation" />
+      <input type="text" id="input-not-overlap" placeholder="[[0, 1], [1, 2]]" class="input-control" />
       Overlap:
-      <input type="text" id="input-overlap" placeholder="[[0, 1], [1, 2]]" class="input-relation" />
+      <input type="text" id="input-overlap" placeholder="[[0, 1], [1, 2]]" class="input-control" />
       Fix:
-      <input type="text" id="input-fix" placeholder="[0, 1, 2]" class="input-relation" />
+      <input type="text" id="input-fix" placeholder="[0, 1, 2]" class="input-control" />
       <hr class="controls">
 
       <button id="btn-process" class="btn-control">Process</button>
       <button id="btn-download-svg" class="btn-control">Download SVG</button>
+      <input type="file" id="input-import-json" class="btn-control" accept=".json" hidden />
+      <button id="btn-import-json" class="btn-control">Import JSON</button>
       <button id="btn-download-json" class="btn-control">Download JSON</button>
-      <button id="btn-debug" class="btn-control" style="display: block;">Debug</button>
+      <button id="btn-debug" class="btn-control" hidden>Debug</button>
     </div>
   </div>
   <script type="module" src="/src/main.js"></script>

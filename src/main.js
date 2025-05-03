@@ -35,8 +35,7 @@ import { polygon2svg } from './polygon2svg.js';
     // Create a new application
     const app = new Application();
     await app.init({ width: 1000, height: 800, backgroundColor: 'white' });
-    app.canvas.style.border = '1px solid black';
-    document.querySelector('#canvas').append(app.canvas);
+    document.querySelector('#div-canvas').append(app.canvas);
 
     // Create a polygon manager
     const htmlElements = {
@@ -94,11 +93,19 @@ import { polygon2svg } from './polygon2svg.js';
     });
 
     importJsonBtn.addEventListener('click', () => {
+        importJsonInput.click();
+    });
+
+    importJsonInput.addEventListener('change', () => {
+        const file = importJsonInput.files[0];
+        if (!file) return;
+
         if (
             !confirm(
                 'This operation will clear the canvas and all configurations. Are you sure to proceed?'
             )
         ) {
+            importJsonInput.value = '';
             return;
         }
         try {
