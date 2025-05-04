@@ -116,6 +116,7 @@ import { polygon2svg } from './polygon2svg.js';
     });
 
     importTextListBtn.addEventListener('click', () => {
+        textListInput.value = '';
         textListInput.click();
     });
 
@@ -153,6 +154,7 @@ import { polygon2svg } from './polygon2svg.js';
     });
 
     importJsonBtn.addEventListener('click', () => {
+        importJsonInput.value = '';
         importJsonInput.click();
     });
 
