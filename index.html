@@ -47,13 +47,34 @@
       Fix:
       <input type="text" id="input-fix" placeholder="[0, 1, 2]" class="input-control" />
       <hr class="controls">
-
       <button id="btn-process" class="btn-control">Process</button>
       <button id="btn-download-svg" class="btn-control">Download SVG</button>
       <input type="file" id="input-import-json" class="btn-control" accept=".json" hidden />
       <button id="btn-import-json" class="btn-control">Import JSON</button>
       <button id="btn-download-json" class="btn-control">Download JSON</button>
+      <button id="btn-advanced-modal" class="btn-control">Advanced Settings</button>
       <button id="btn-debug" class="btn-control" hidden>Debug</button>
+    </div>
+    <!-- Modal Advanced Settings -->
+    <div id="modal-advanced" class="modal-overlay">
+      <div class="modal">
+        <h2>Advanced Settings</h2>
+        <label>
+          Learning Rate:
+          <input type="number" id="input-learning-rate" step="0.01" value="0.01" />
+        </label>
+        <label>
+          Max. Iteration:
+          <input type="number" id="input-max-iteration" value="100" />
+        </label>
+        <label>
+          Penalty Increase Factor:
+          <input type="number" id="input-penalty-factor" step="0.1" value="2" />
+        </label>
+        <div class="modal-actions">
+          <button id="btn-advanced-close" class="btn-control">Close</button>
+        </div>
+      </div>
     </div>
   </div>
   <script type="module" src="/src/main.js"></script>

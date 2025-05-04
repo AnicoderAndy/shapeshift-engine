@@ -33,10 +33,18 @@ import { polygon2svg } from './polygon2svg.js';
     const overlapInput = document.querySelector('#input-overlap');
     const fixInput = document.querySelector('#input-fix');
     const relationInput = { notOverlapInput, overlapInput, fixInput };
+    const maxIterInput = document.querySelector('#input-max-iteration');
+    const learningRateInput = document.querySelector('#input-learning-rate');
+    const penaltyFactorInput = document.querySelector('#input-penalty-factor');
 
     // Get UI Controls
     const toggleHeader = document.querySelector('#toggle-polygon-list');
     let isCollapsed = false;
+
+    // Get Modal related
+    const advancedModal = document.querySelector('#modal-advanced');
+    const advancedModalSwitch = document.querySelector('#btn-advanced-modal');
+    const advancedModalCloseBtn = document.querySelector('#btn-advanced-close');
 
     // Create a new application
     const app = new Application();
@@ -70,6 +78,10 @@ import { polygon2svg } from './polygon2svg.js';
         btn.disabled = true;
         btn.innerHTML = 'Processing...';
 
+        const eta = learningRateInput.value;
+        const eta_c = penaltyFactorInput.value;
+        const maxIter = maxIterInput.value;
+
         try {
             // Get content in the input boxes
             polyManager.updateRelation();
@@ -77,10 +89,10 @@ import { polygon2svg } from './polygon2svg.js';
             polyManager.setupFix();
             // Start optimization process
             await polyManager.optimize({
-                eta: 0.01,
+                eta,
                 c0: 1e-3,
-                eta_c: 3,
-                maxIter: 100,
+                eta_c,
+                maxIter,
             });
         } catch (error) {
             console.error('Error during processing:', error);
@@ -178,7 +190,15 @@ import { polygon2svg } from './polygon2svg.js';
         isCollapsed = !isCollapsed;
         uiPolyList.classList.toggle('hidden', isCollapsed);
         toggleHeader.classList.toggle('hidden', isCollapsed);
-      });
+    });
+
+    advancedModalSwitch.addEventListener('click', () => {
+        advancedModal.style.display = 'flex';
+    });
+
+    advancedModalCloseBtn.addEventListener('click', () => {
+        advancedModal.style.display = 'none';
+    });
 
     debugBtn.addEventListener('click', () => {});
 })();

@@ -200,6 +200,11 @@ const buildRelation = (polyManager) => {
 
 const optimization = async (optimizationParameters) => {
     const { epsilon, squaredSumPenalty, params, paramType, eta, c0 = 1e-4, eta_c = 1.5, maxIter = 50 } = optimizationParameters;
+    console.log('Process Info: Optimization started with the following parameters:');
+    console.log('Learning rate:', eta);
+    console.log('Penalty increase factor:', eta_c);
+    console.log('Max Iteration:', maxIter);
+    
     let c = c0;
     for (const key in params) {
         params[key] = 0;
