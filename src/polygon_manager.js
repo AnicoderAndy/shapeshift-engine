@@ -21,6 +21,22 @@ function getRandomColor() {
 }
 
 /**
+ * Get a random point in a rectangle.
+ * @param {[number, number]} topLeft
+ * @param {[number, number]} bottomRight
+ * @returns {[number, number]}
+ */
+function getRandomPointInRect(topLeft, bottomRight) {
+    const [x1, y1] = topLeft;
+    const [x2, y2] = bottomRight;
+
+    const x = Math.random() * (x2 - x1) + x1;
+    const y = Math.random() * (y2 - y1) + y1;
+
+    return [x, y];
+}
+
+/**
  * Generate a flicker handler for a specific Graphics object.
  * @param {Graphics | Text} graphicsRef The Graphics object to flicker.
  * @returns {import("pixi.js").TickerCallback<any>} The flicker handler function.
@@ -136,7 +152,7 @@ export class polygonManager {
      */
     pushText(text, options = {}) {
         const {
-            position = [500, -400],
+            position = getRandomPointInRect([250, -150], [750, -650]),
             size = 16,
             fontFamily = 'Arial',
         } = options;
@@ -172,7 +188,7 @@ export class polygonManager {
 
         let li = document.createElement('li');
         const polygonIndex = this.size() - 1;
-        li.innerHTML = `Text ${polygonIndex}`;
+        li.innerHTML = `Text ${polygonIndex}: ${text}`;
         this._uiPolyList.appendChild(li);
         li.addEventListener('click', () => {
             const graphicsRef =

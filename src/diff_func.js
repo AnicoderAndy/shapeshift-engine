@@ -218,7 +218,7 @@ const optimization = async (optimizationParameters) => {
 
         // Iterate through params, generate newParams
         for (const key in params) {
-            gradVal[key] = clamp(gradVal[key], -200, 200);
+            gradVal[key] = clamp(gradVal[key], -700, 700);
             params[key] -= eta * (gradVal[key] ?? 0);
             maxGrad = Math.max(maxGrad, Math.abs(gradVal[key] ?? 0));
         }
@@ -229,6 +229,7 @@ const optimization = async (optimizationParameters) => {
             return params;
         }
         c *= eta_c;
+        c = clamp(c, 0, 1e5);
     }
     console.warn('Process warning: the optimization was not converged.');
     alert('Process warning: the optimization was not converged.\nChecking whether configuration is valid is suggested.')
