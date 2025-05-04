@@ -34,6 +34,10 @@ import { polygon2svg } from './polygon2svg.js';
     const fixInput = document.querySelector('#input-fix');
     const relationInput = { notOverlapInput, overlapInput, fixInput };
 
+    // Get UI Controls
+    const toggleHeader = document.querySelector('#toggle-polygon-list');
+    let isCollapsed = false;
+
     // Create a new application
     const app = new Application();
     await app.init({ width: 1000, height: 800, backgroundColor: 'white' });
@@ -59,7 +63,7 @@ import { polygon2svg } from './polygon2svg.js';
         'click',
         polyManager.newTextHandler.bind(polyManager)
     );
-    processBtn.addEventListener('click', async e => {
+    processBtn.addEventListener('click', async (e) => {
         const btn = e.target;
         if (btn.disabled) return;
 
@@ -76,7 +80,7 @@ import { polygon2svg } from './polygon2svg.js';
                 eta: 0.01,
                 c0: 1e-3,
                 eta_c: 3,
-                maxIter: 100
+                maxIter: 100,
             });
         } catch (error) {
             console.error('Error during processing:', error);
@@ -169,6 +173,12 @@ import { polygon2svg } from './polygon2svg.js';
             return;
         }
     });
+
+    toggleHeader.addEventListener('click', () => {
+        isCollapsed = !isCollapsed;
+        uiPolyList.classList.toggle('hidden', isCollapsed);
+        toggleHeader.classList.toggle('hidden', isCollapsed);
+      });
 
     debugBtn.addEventListener('click', () => {});
 })();

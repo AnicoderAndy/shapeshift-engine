@@ -15,7 +15,9 @@
 
 <body>
   <div style="display: flex; height: 100vh;">
+    <!-- Canvas Region -->
     <div id="div-canvas" class="application"></div>
+    <!-- Controls Region -->
     <div id="div-controls">
       Polygon Color: <input type="color" id="input-polygon-color" value="#ff0000"> or <input type="checkbox"
         id="input-polygon-random-color" checked>Random Color
@@ -31,9 +33,12 @@
       <input type="file" id="input-text-list" class="btn-control" accept=".txt" hidden />
       <button id="btn-import-text-list" class="btn-control">Import Text List</button>
       <hr class="controls">
-      Click the list item to highlight the polygon on the canvas:
-      <ul id="list-polygons"></ul>
-
+      <div class="section-collapsible">
+        <div id="toggle-polygon-list" class="collapsible-header">
+          <span class="arrow">▼</span> Polygon List
+        </div>
+        <ul id="list-polygons" class="collapsible-content"></ul>
+      </div>
       <hr class="controls">
       Do not overlap:
       <input type="text" id="input-not-overlap" placeholder="[[0, 1], [1, 2]]" class="input-control" />

@@ -50,6 +50,41 @@ body {
     background-color: #0056b3;
 }
 
+.section-collapsible {
+    margin-top: 20px;
+}
+
+.collapsible-header {
+    cursor: pointer;
+    font-weight: bold;
+    /* background-color: #eaeaea; */
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.collapsible-header:hover {
+    background-color: #dcdcdc;
+}
+
+.arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    width: 1em;
+    text-align: center;
+}
+
+.collapsible-header.hidden .arrow {
+    transform: rotate(-90deg);
+}
+
+.collapsible-content.hidden {
+    display: none;
+}
+
 #list-polygons {
     margin: 10px 0;
     padding: 0;
