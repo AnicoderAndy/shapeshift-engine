@@ -39,6 +39,7 @@
         "import_text_list_error_caught": "An error occurred during importing text list.\nPlease check the console for more details.",
         "import_json_error_caught": "An error occurred during importing JSON.\nPlease check the console for more details.",
         "draw_not_enought_vertices": "A polygon must have at least 2 vertices.",
-        "draw_not_simple": "The polygon is not simple (edges intersect). Please redraw."
+        "draw_not_simple": "The polygon is not simple (edges intersect). Please redraw.",
+        "text_empty": "Please enter your text first."
     }
 }

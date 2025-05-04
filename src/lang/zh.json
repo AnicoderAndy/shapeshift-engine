@@ -39,6 +39,7 @@
         "import_text_list_error_caught": "导入文本列表时出现错误。\n更多错误细节请查看控制台。",
         "import_json_error_caught": "导入JSON时出现错误。\n更多错误细节请查看控制台。",
         "draw_not_enought_vertices": "一个多边形至少应该有两个顶点。",
-        "draw_not_simple": "此多边形不是简单多边形，它有交叉的边。请重新绘制。"
+        "draw_not_simple": "此多边形不是简单多边形，它有交叉的边。请重新绘制。",
+        "text_empty": "请先输入文本。"
     }
 }

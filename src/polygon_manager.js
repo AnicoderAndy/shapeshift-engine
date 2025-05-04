@@ -292,6 +292,10 @@ export class polygonManager {
 
     newTextHandler(e) {
         const textString = this._textInput.value;
+        if (textString == '') {
+            alert(getMsg('al.text_empty'));
+            return;
+        }
         const fontFamily = this._fontFamilyInput.value;
         const fontSize = Number(this._fontSizeInput.value);
         this._textInput.value = '';
