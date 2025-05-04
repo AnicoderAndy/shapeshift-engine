@@ -32,5 +32,13 @@
     },
     "header": {
         "advanced_settings": "高级选项"
+    },
+    "al": {
+        "optimize_not_converged": "执行警告：优化未收敛。\n建议您优先检查输入的规则之间是否不冲突",
+        "process_error_caught": "执行过程中出现错误。\n更多错误细节请查看控制台。",
+        "import_text_list_error_caught": "导入文本列表时出现错误。\n更多错误细节请查看控制台。",
+        "import_json_error_caught": "导入JSON时出现错误。\n更多错误细节请查看控制台。",
+        "draw_not_enought_vertices": "一个多边形至少应该有两个顶点。",
+        "draw_not_simple": "此多边形不是简单多边形，它有交叉的边。请重新绘制。"
     }
 }

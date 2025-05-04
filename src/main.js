@@ -98,7 +98,7 @@ import { getMsg, switchLang } from './i18n.js';
             });
         } catch (error) {
             console.error('Error during processing:', error);
-            alert(`An error occurred during processing: ${error}`);
+            alert(getMsg('al.process_error_caught'));
         } finally {
             btn.innerHTML = getMsg('btn.process');
             btn.disabled = false;
@@ -150,7 +150,7 @@ import { getMsg, switchLang } from './i18n.js';
             reader.readAsText(file);
         } catch (error) {
             console.error('Error importing text list:', error);
-            alert(`An error occurred during importing text list: ${error}`);
+            alert(getMsg('al.import_text_list_error_caught'));
             return;
         }
     });
@@ -185,7 +185,7 @@ import { getMsg, switchLang } from './i18n.js';
             reader.readAsText(file);
         } catch (error) {
             console.error('Error importing JSON:', error);
-            alert(`An error occurred during importing JSON: ${error}`);
+            alert(getMsg('al.import_json_error_caught'));
             return;
         }
     });

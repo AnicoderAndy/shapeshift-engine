@@ -5,6 +5,7 @@
 import { Real, Vec, compile, fn, struct, vjp, add, mul, sub, sqrt, select, gt, lt, and, div, Bool, not, geq, neg, abs, vec } from 'rose';
 import { polygonManager } from './polygon_manager';
 import { Polygon } from './polygon';
+import { getMsg } from './i18n';
 
 const sqr = x => mul(x, x);
 const cross = (a, b) => sub(mul(a[0], b[1]), mul(a[1], b[0]));
@@ -237,7 +238,7 @@ const optimization = async (optimizationParameters) => {
         c = clamp(c, 0, 1e5);
     }
     console.warn('Process warning: the optimization was not converged.');
-    alert('Process warning: the optimization was not converged.\nChecking whether configuration is valid is suggested.')
+    alert(getMsg('al.optimize_not_converged'));
     console.log(params);
     return params;
 };

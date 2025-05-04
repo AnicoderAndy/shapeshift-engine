@@ -263,7 +263,7 @@ export class polygonManager {
                 console.error(
                     'Invalid polygon detected: not enough vertices, at least 2 vertices are needed.'
                 );
-                alert('A polygon must have at least 2 vertices.');
+                alert(getMsg('al.draw_not_enought_vertices'));
                 this.clearCurrentPolygon();
                 return;
             }
@@ -271,9 +271,7 @@ export class polygonManager {
             // Not Simple:
             else if (!Polygon.isSimplePolygon(this._currentVertices)) {
                 console.error('Invalid polygon detected: edges intersect');
-                alert(
-                    'The polygon is not simple (edges intersect). Please redraw.'
-                );
+                alert(getMsg('al.draw_not_simple'));
                 this.clearCurrentPolygon();
                 return;
             }
