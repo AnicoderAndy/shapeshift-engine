@@ -1,0 +1,36 @@
+{
+    "title": "ShapeShift Engine | 形动引擎",
+    "label": {
+        "polygon_color": "多边形颜色：",
+        "enter_text": "输入文本：",
+        "font_size": "字号：",
+        "font_family": "字体：",
+        "not_overlap": "不重叠：",
+        "overlap": "重叠：",
+        "fix": "固定：",
+        "learning_rate": "学习率：",
+        "max_iteration": "最大循环次数：",
+        "penalty_factor": "惩戒增长系数："
+    },
+    "text": {
+        "or": "或",
+        "random_color": "随机颜色",
+        "polygon_list": "多边形列表："
+    },
+    "btn": {
+        "new_polygon": "新增多边形",
+        "new_polygon_triggered": "绘制中……再次点击以确认",
+        "new_text": "新增文本",
+        "import_text_list": "导入文本列表",
+        "process": "执行",
+        "processing": "执行中...",
+        "download_svg": "下载 SVG",
+        "import_json": "导入 JSON",
+        "download_json": "下载 JSON",
+        "advanced_settings": "高级选项",
+        "close": "关闭"
+    },
+    "header": {
+        "advanced_settings": "高级选项"
+    }
+}

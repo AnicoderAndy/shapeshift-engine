@@ -3,6 +3,7 @@ import { Polygon } from './polygon';
 import { Application, Graphics, Text } from 'pixi.js';
 import { polygonGraphics } from './polygon_graphics';
 import { beginOptimization } from './diff_func';
+import { getMsg } from './i18n';
 
 /**
  * @typedef {Object} Relation
@@ -247,8 +248,8 @@ export class polygonManager {
         const button = e.currentTarget;
 
         button.textContent = this._drawingPolygon
-            ? 'Drawing...Click again to confirm'
-            : 'New Polygon';
+            ? getMsg('btn.new_polygon_triggered')
+            : getMsg('btn.new_polygon');
         console.log('Drawing info: drawing mode ==', this._drawingPolygon);
 
         if (this._drawingPolygon) {

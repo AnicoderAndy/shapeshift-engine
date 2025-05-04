@@ -5,6 +5,25 @@ body {
     color: #333;
 }
 
+/* Begins language switch */
+.lang-floating {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1000;
+    background: #444;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.lang-floating:hover {
+    background: #666;
+}
+
+/* Begins canvas region */
 #div-canvas {
     flex: 7;
     background-color: #f0f0f0;
@@ -19,6 +38,7 @@ body {
     display: block;
 }
 
+/* Begins control region */
 .input-control,
 .btn-control {
     width: 100%;

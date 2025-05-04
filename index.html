@@ -1,83 +1,190 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="title">ShapeShift Engine</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <link rel="stylesheet" href="/src/style.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShapeShift Engine</title>
-</head>
-
-<body>
-  <div style="display: flex; height: 100vh;">
-    <!-- Canvas Region -->
-    <div id="div-canvas" class="application"></div>
-    <!-- Controls Region -->
-    <div id="div-controls">
-      Polygon Color: <input type="color" id="input-polygon-color" value="#ff0000"> or <input type="checkbox"
-        id="input-polygon-random-color" checked>Random Color
-      <button id="btn-draw-poly" class="btn-control">New Polygon</button>
-      <hr class="controls">
-      Enter Text:
-      <input type="text" id="input-text" class="input-control" placeholder="Enter text here..." />
-      Font size:
-      <input type="text" id="input-font-size" class="input-control" value="20">
-      Font family:
-      <input type="text" id="input-font-family" class="input-control" value="SimHei">
-      <button id="btn-new-text" class="btn-control">New Text</button>
-      <input type="file" id="input-text-list" class="btn-control" accept=".txt" hidden />
-      <button id="btn-import-text-list" class="btn-control">Import Text List</button>
-      <hr class="controls">
-      <div class="section-collapsible">
-        <div id="toggle-polygon-list" class="collapsible-header">
-          <span class="arrow">▼</span> Polygon List
+  <body>
+    <button id="btn-toggle-lang" class="lang-floating">🌐 中文 | En</button>
+    <div style="display: flex; height: 100vh">
+      <!-- Canvas Region -->
+      <div id="div-canvas" class="application"></div>
+      <!-- Controls Region -->
+      <div id="div-controls">
+        <label for="input-polygon-color" data-i18n="label.polygon_color"
+          >Polygon Color:</label
+        >
+        <input type="color" id="input-polygon-color" value="#ff0000" />
+        <span data-i18n="text.or">or</span>
+        <input type="checkbox" id="input-polygon-random-color" checked /><span
+          data-i18n="text.random_color"
+          >Random Color</span
+        >
+        <button
+          id="btn-draw-poly"
+          class="btn-control"
+          data-i18n="btn.new_polygon"
+        >
+          New Polygon
+        </button>
+        <hr class="controls" />
+        <label for="input-text" data-i18n="label.enter_text">Enter Text:</label>
+        <input
+          type="text"
+          id="input-text"
+          class="input-control"
+        />
+        <label for="input-font-size" data-i18n="label.font_size"
+          >Font size:</label
+        >
+        <input
+          type="text"
+          id="input-font-size"
+          class="input-control"
+          value="20"
+        />
+        <label for="input-font-family" data-i18n="label.font_family"
+          >Font family:</label
+        >
+        <input
+          type="text"
+          id="input-font-family"
+          class="input-control"
+          value="SimHei"
+        />
+        <button id="btn-new-text" class="btn-control" data-i18n="btn.new_text">
+          New Text
+        </button>
+        <input
+          type="file"
+          id="input-text-list"
+          class="btn-control"
+          accept=".txt"
+          hidden
+        />
+        <button
+          id="btn-import-text-list"
+          class="btn-control"
+          data-i18n="btn.import_text_list"
+        >
+          Import Text List
+        </button>
+        <hr class="controls" />
+        <div class="section-collapsible">
+          <div id="toggle-polygon-list" class="collapsible-header">
+            <span class="arrow">▼</span>
+            <span data-i18n="text.polygon_list">Polygon List</span>
+          </div>
+          <ul id="list-polygons" class="collapsible-content"></ul>
         </div>
-        <ul id="list-polygons" class="collapsible-content"></ul>
+        <hr class="controls" />
+        <label for="input-not-overlap" data-i18n="label.not_overlap"
+          >Do not overlap:</label
+        >
+        <input
+          type="text"
+          id="input-not-overlap"
+          placeholder="[[0, 1], [1, 2]]"
+          class="input-control"
+        />
+        <label for="input-overlap" data-i18n="label.overlap">Overlap:</label>
+        <input
+          type="text"
+          id="input-overlap"
+          placeholder="[[0, 1], [1, 2]]"
+          class="input-control"
+        />
+        <label for="input-fix" data-i18n="label.fix">Fix:</label>
+        <input
+          type="text"
+          id="input-fix"
+          placeholder="[0, 1, 2]"
+          class="input-control"
+        />
+        <hr class="controls" />
+        <button id="btn-process" class="btn-control" data-i18n="btn.process">
+          Process
+        </button>
+        <button
+          id="btn-download-svg"
+          class="btn-control"
+          data-i18n="btn.download_svg"
+        >
+          Download SVG
+        </button>
+        <input
+          type="file"
+          id="input-import-json"
+          class="btn-control"
+          accept=".json"
+          hidden
+        />
+        <button
+          id="btn-import-json"
+          class="btn-control"
+          data-i18n="btn.import_json"
+        >
+          Import JSON
+        </button>
+        <button
+          id="btn-download-json"
+          class="btn-control"
+          data-i18n="btn.download_json"
+        >
+          Download JSON
+        </button>
+        <button
+          id="btn-advanced-modal"
+          class="btn-control"
+          data-i18n="btn.advanced_settings"
+        >
+          Advanced Settings
+        </button>
+        <button id="btn-debug" class="btn-control" hidden>Debug</button>
       </div>
-      <hr class="controls">
-      Do not overlap:
-      <input type="text" id="input-not-overlap" placeholder="[[0, 1], [1, 2]]" class="input-control" />
-      Overlap:
-      <input type="text" id="input-overlap" placeholder="[[0, 1], [1, 2]]" class="input-control" />
-      Fix:
-      <input type="text" id="input-fix" placeholder="[0, 1, 2]" class="input-control" />
-      <hr class="controls">
-      <button id="btn-process" class="btn-control">Process</button>
-      <button id="btn-download-svg" class="btn-control">Download SVG</button>
-      <input type="file" id="input-import-json" class="btn-control" accept=".json" hidden />
-      <button id="btn-import-json" class="btn-control">Import JSON</button>
-      <button id="btn-download-json" class="btn-control">Download JSON</button>
-      <button id="btn-advanced-modal" class="btn-control">Advanced Settings</button>
-      <button id="btn-debug" class="btn-control" hidden>Debug</button>
-    </div>
-    <!-- Modal Advanced Settings -->
-    <div id="modal-advanced" class="modal-overlay">
-      <div class="modal">
-        <h2>Advanced Settings</h2>
-        <label>
-          Learning Rate:
-          <input type="number" id="input-learning-rate" step="0.01" value="0.01" />
-        </label>
-        <label>
-          Max. Iteration:
+      <!-- Modal Advanced Settings -->
+      <div id="modal-advanced" class="modal-overlay">
+        <div class="modal">
+          <h2 data-i18n="header.advanced_settings">Advanced Settings</h2>
+          <label for="input-learning-rate" data-i18n="label.learning_rate">
+            Learning Rate:</label
+          >
+          <input
+            type="number"
+            id="input-learning-rate"
+            step="0.01"
+            value="0.01"
+          />
+          <label for="input-max-iteration" data-i18n="label.max_iteration">
+            Max. Iteration:</label
+          >
           <input type="number" id="input-max-iteration" value="100" />
-        </label>
-        <label>
-          Penalty Increase Factor:
+
+          <label for="input-penalty-factor" data-i18n="label.penalty_factor">
+            Penalty Increase Factor:</label
+          >
           <input type="number" id="input-penalty-factor" step="0.1" value="2" />
-        </label>
-        <div class="modal-actions">
-          <button id="btn-advanced-close" class="btn-control">Close</button>
+
+          <div class="modal-actions">
+            <button
+              id="btn-advanced-close"
+              class="btn-control"
+              data-i18n="btn.close"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <script type="module" src="/src/main.js"></script>
-</body>
-
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

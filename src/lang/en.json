@@ -1,0 +1,36 @@
+{
+    "title": "ShapeShift Engine",
+    "label": {
+        "polygon_color": "Polygon Color:",
+        "enter_text": "Enter Text:",
+        "font_size": "Font size:",
+        "font_family": "Font family:",
+        "not_overlap": "Do not overlap:",
+        "overlap": "Overlap:",
+        "fix": "Fix:",
+        "learning_rate": "Learning Rate:",
+        "max_iteration": "Max. Iteration:",
+        "penalty_factor": "Penalty Increase Factor:"
+    },
+    "text": {
+        "or": "or",
+        "random_color": "Random Color",
+        "polygon_list": "Polygon List"
+    },
+    "btn": {
+        "new_polygon": "New Polygon",
+        "new_polygon_triggered": "Drawing...Click again to confirm",
+        "new_text": "New Text",
+        "import_text_list": "Import Text List",
+        "process": "Process",
+        "process_triggered": "Processing...",
+        "download_svg": "Download SVG",
+        "import_json": "Import JSON",
+        "download_json": "Download JSON",
+        "advanced_settings": "Advanced Settings",
+        "close": "Close"
+    },
+    "header": {
+        "advanced_settings": "Advanced Settings"
+    }
+}

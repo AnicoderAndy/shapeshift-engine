@@ -1,6 +1,7 @@
 import { Application, Text } from 'pixi.js';
 import { polygonManager } from './polygon_manager.js';
 import { polygon2svg } from './polygon2svg.js';
+import { getMsg, switchLang } from './i18n.js';
 
 (async () => {
     // Get polygon list element
@@ -40,6 +41,7 @@ import { polygon2svg } from './polygon2svg.js';
     // Get UI Controls
     const toggleHeader = document.querySelector('#toggle-polygon-list');
     let isCollapsed = false;
+    const languageBtn = document.querySelector('#btn-toggle-lang');
 
     // Get Modal related
     const advancedModal = document.querySelector('#modal-advanced');
@@ -76,7 +78,7 @@ import { polygon2svg } from './polygon2svg.js';
         if (btn.disabled) return;
 
         btn.disabled = true;
-        btn.innerHTML = 'Processing...';
+        btn.innerHTML = getMsg('btn.process_triggered');
 
         const eta = learningRateInput.value;
         const eta_c = penaltyFactorInput.value;
@@ -98,7 +100,7 @@ import { polygon2svg } from './polygon2svg.js';
             console.error('Error during processing:', error);
             alert(`An error occurred during processing: ${error}`);
         } finally {
-            btn.innerHTML = 'Process';
+            btn.innerHTML = getMsg('btn.process');
             btn.disabled = false;
         }
     });
@@ -200,6 +202,10 @@ import { polygon2svg } from './polygon2svg.js';
 
     advancedModalCloseBtn.addEventListener('click', () => {
         advancedModal.style.display = 'none';
+    });
+
+    languageBtn.addEventListener('click', () => {
+        switchLang();
     });
 
     debugBtn.addEventListener('click', () => {});
