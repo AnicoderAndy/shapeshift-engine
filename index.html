@@ -85,6 +85,7 @@
         <button
           id="btn-relation-modal"
           class="btn-control"
+          data-i18n="btn.polygon_relation_editor"
         >
           Polygon Relation Editor
         </button>
@@ -152,7 +153,7 @@
         >
           Advanced Settings
         </button>
-        <button id="btn-debug" class="btn-control" >Debug</button>
+        <button id="btn-debug" class="btn-control" hidden>Debug</button>
       </div>
       <!-- Modal Advanced Settings -->
       <div id="modal-advanced" class="modal-overlay">
@@ -191,24 +192,24 @@
       <!-- Modal relation -->
       <div id="modal-relation" class="modal-overlay">
         <div class="modal">
-          <h2>Polygon Relation Editor</h2>
+          <h2 data-i18n="header.polygon_relation_editor">Polygon Relation Editor</h2>
           <div class="relation-body">
             <div id="log-messages" class="relation-log"></div>
             <div class="relation-controls">
-              <label for="slct-main-poly">Main Polygon:</label>
+              <label for="slct-main-poly" data-i18n="label.main_polygon">Main Polygon:</label>
               <select id="slct-main-poly"></select>
               <div class="modal-actions">
-                <button class="btn-control" id="btn-relation-slct-all">Select All</button>
-                <button class="btn-control" id="btn-relation-rvrs-slct">Reverse Selection</button>
+                <button class="btn-control" id="btn-relation-slct-all" data-i18n="btn.select_all">Select All</button>
+                <button class="btn-control" id="btn-relation-rvrs-slct" data-i18n="btn.reverse_selection">Reverse Selection</button>
               </div>
               <div class="poly-list" id="relation-poly-list"></div>
               <div class="long-actions">
-                <button class="btn-control" id="btn-mutual-not-overlap">Make selected polygons not overlap with each other</button>
-                <button class="btn-control" id="btn-mutual-overlap">Make selected polygons overlap with each other</button>
-                <button class="btn-control" id="btn-main-not-overlap">Make selected polygons not overlap with Main Polygon</button>
-                <button class="btn-control" id="btn-main-overlap">Make selected polygons overlap with Main Polygon</button>
-                <button class="btn-control" id="btn-fixed">Make selected polygons fixed</button>
-                <button class="btn-control" id="btn-clear-relation">Clear all relations</button>
+                <button class="btn-control" id="btn-mutual-not-overlap" data-i18n="btn.mutual_not_overlap">Make selected polygons not overlap with each other</button>
+                <button class="btn-control" id="btn-mutual-overlap" data-i18n="btn.mutual_overlap">Make selected polygons overlap with each other</button>
+                <button class="btn-control" id="btn-main-not-overlap" data-i18n="btn.main_not_overlap">Make selected polygons not overlap with Main Polygon</button>
+                <button class="btn-control" id="btn-main-overlap" data-i18n="btn.main_overlap">Make selected polygons overlap with Main Polygon</button>
+                <button class="btn-control" id="btn-fixed" data-i18n="btn.fix">Make selected polygons fixed</button>
+                <button class="btn-control" id="btn-clear-relation" data-i18n="btn.clear">Clear all relations</button>
               </div>
             </div>
           </div>

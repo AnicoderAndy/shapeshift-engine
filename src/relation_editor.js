@@ -1,5 +1,6 @@
 import { not } from 'rose';
 import { polygonManager } from './polygon_manager';
+import { getMsg } from './i18n';
 
 //@ts-check
 let relationMatrix = [];
@@ -57,9 +58,7 @@ function setMutualRelation(relationType) {
     for (let i = 0; i < checked.length; i++) {
         for (let j = i + 1; j < checked.length; j++) {
             if (relationMatrix[checked[i]][checked[j]] !== 0) {
-                log(
-                    'Warning: A relation bewtween the following indices is overwritten:'
-                );
+                log(getMsg('lg.relation_overwritten'));
                 log(checked[i] + ', ' + checked[j]);
             }
             relationMatrix[checked[i]][checked[j]] = relationType;
@@ -67,8 +66,10 @@ function setMutualRelation(relationType) {
         }
     }
     log(
-        'You have set the relation among the following polygons to be ' +
-            (relationType == 1 ? 'not overlap' : 'overlap')
+        getMsg('lg.mutual_relation_set') +
+            (relationType == 1
+                ? getMsg('lg.not_overlap')
+                : getMsg('lg.overlap'))
     );
     log(JSON.stringify(checked));
 }
@@ -83,19 +84,19 @@ function setMainTargetRelation(relationType) {
     if (checked.length < 1) return;
     for (let i = 0; i < checked.length; i++) {
         if (relationMatrix[checked[i]][mainTarget] !== 0) {
-            log(
-                'Warning: A relation bewtween the following indices is overwritten:'
-            );
+            log(getMsg('lg.relation_overwritten'));
             log(checked[i] + ', ' + mainTarget);
         }
         relationMatrix[mainTarget][checked[i]] = relationType;
         relationMatrix[checked[i]][mainTarget] = relationType;
     }
     log(
-        'Following polygons are set to ' +
-            (relationType == 1 ? 'not overlap' : 'overlap') +
-            ' with ' +
-            mainTarget
+        getMsg('lg.main_relation_set_1') +
+            mainTarget +
+            getMsg('lg.main_relation_set_2') +
+            (relationType == 1
+                ? getMsg('lg.not_overlap')
+                : getMsg('lg.overlap'))
     );
     log(JSON.stringify(checked));
 }
@@ -105,7 +106,7 @@ function setFix() {
     for (let i = 0; i < checked.length; i++) {
         isFixedList[checked[i]] = 1;
     }
-    log('Following polygons are set to be fixed:');
+    log(getMsg('lg.fix_set'));
     log(JSON.stringify(checked));
 }
 

@@ -10,7 +10,8 @@
         "fix": "固定：",
         "learning_rate": "学习率：",
         "max_iteration": "最大循环次数：",
-        "penalty_factor": "惩戒增长系数："
+        "penalty_factor": "惩戒增长系数：",
+        "main_polygon": "主多边形："
     },
     "text": {
         "or": "或",
@@ -28,10 +29,20 @@
         "import_json": "导入 JSON",
         "download_json": "下载 JSON",
         "advanced_settings": "高级选项",
-        "close": "关闭"
+        "close": "关闭",
+        "polygon_relation_editor": "多边形关系编辑器",
+        "select_all": "全选",
+        "reverse_selection": "反选",
+        "mutual_not_overlap": "使选中多边形互不重叠",
+        "mutual_overlap": "使选中多边形互相重叠",
+        "main_not_overlap": "使选定多边形与“主多边形”不重叠",
+        "main_overlap": "使选定多边形与“主多边形”重叠",
+        "fix": "使选定多边形固定",
+        "clear": "清除所有关系"
     },
     "header": {
-        "advanced_settings": "高级选项"
+        "advanced_settings": "高级选项",
+        "polygon_relation_editor": "多边形关系编辑器"
     },
     "al": {
         "optimize_not_converged": "执行警告：优化未收敛。\n建议您优先检查输入的规则之间是否不冲突",
@@ -41,5 +52,14 @@
         "draw_not_enought_vertices": "一个多边形至少应该有两个顶点。",
         "draw_not_simple": "此多边形不是简单多边形，它有交叉的边。请重新绘制。",
         "text_empty": "请先输入文本。"
+    },
+    "lg": {
+        "relation_overwritten": "警告：以下关系被覆写",
+        "mutual_relation_set": "您已将以下多边形之间的关系设为 ",
+        "main_relation_set_1": "以下多边形与 ",
+        "main_relation_set_2": " 之间的关系已经被设为",
+        "fix_set": "以下多边形已被设为固定：",
+        "not_overlap": "不重叠",
+        "overlap": "重叠"
     }
 }

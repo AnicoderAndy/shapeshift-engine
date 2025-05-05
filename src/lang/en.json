@@ -10,7 +10,8 @@
         "fix": "Fix:",
         "learning_rate": "Learning Rate:",
         "max_iteration": "Max. Iteration:",
-        "penalty_factor": "Penalty Increase Factor:"
+        "penalty_factor": "Penalty Increase Factor:",
+        "main_polygon": "Main Polygon:"
     },
     "text": {
         "or": "or",
@@ -28,10 +29,20 @@
         "import_json": "Import JSON",
         "download_json": "Download JSON",
         "advanced_settings": "Advanced Settings",
-        "close": "Close"
+        "close": "Close",
+        "polygon_relation_editor": "Polygon Relation Editor",
+        "select_all": "Select All",
+        "reverse_selection": "Reverse Selection",
+        "mutual_not_overlap": "Make selected polygons not overlap with each other",
+        "mutual_overlap": "Make selected polygons overlap with each other",
+        "main_not_overlap": "Make selected polygons not overlap with Main Polygon",
+        "main_overlap": "Make selected polygons overlap with Main Polygon",
+        "fix": "Make selected polygons fixed",
+        "clear": "Clear all relations"
     },
     "header": {
-        "advanced_settings": "Advanced Settings"
+        "advanced_settings": "Advanced Settings",
+        "polygon_relation_editor": "Polygon Relation Editor"
     },
     "al": {
         "optimize_not_converged": "Process warning: the optimization was not converged.\nChecking whether configuration is valid is suggested.",
@@ -41,5 +52,14 @@
         "draw_not_enought_vertices": "A polygon must have at least 2 vertices.",
         "draw_not_simple": "The polygon is not simple (edges intersect). Please redraw.",
         "text_empty": "Please enter your text first."
+    },
+    "lg": {
+        "relation_overwritten": "Warning: A relation bewtween the following indices is overwritten:",
+        "mutual_relation_set": "You have set the relation among the following polygons to be ",
+        "main_relation_set_1": "Following polygons and ",
+        "main_relation_set_2": " are set to be ",
+        "fix_set": "Following polygons are set to be fixed:",
+        "not_overlap": "not overlap",
+        "overlap": "overlap"
     }
 }
