@@ -11,7 +11,8 @@
         "learning_rate": "学习率：",
         "max_iteration": "最大循环次数：",
         "penalty_factor": "惩戒增长系数：",
-        "main_polygon": "主多边形："
+        "main_polygon": "主多边形：",
+        "enable_input_relation": "显示关系输入框"
     },
     "text": {
         "or": "或",

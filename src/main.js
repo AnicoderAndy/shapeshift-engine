@@ -205,6 +205,12 @@ import { setupRelationEditor } from './relation_editor.js';
     });
 
     advancedModalCloseBtn.addEventListener('click', () => {
+        const relationRegion = document.querySelector('#div-relation-input');
+        if (document.querySelector('#input-enable-input-relation').checked) {
+            relationRegion.hidden = false;
+        } else {
+            relationRegion.hidden = true;
+        }
         advancedModal.style.display = 'none';
     });
 

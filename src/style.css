@@ -234,3 +234,15 @@ input[type='color'] {
     flex: 5;
     color: #000;
 }
+
+.form-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 14px 0;
+}
+
+.form-inline label {
+    display: inline;
+    margin: 0;
+}

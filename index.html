@@ -89,7 +89,7 @@
         >
           Polygon Relation Editor
         </button>
-        <div hidden>
+        <div id="div-relation-input" hidden>
           <label for="input-not-overlap" data-i18n="label.not_overlap"
             >Do not overlap:</label
           >
@@ -177,7 +177,10 @@
             Penalty Increase Factor:</label
           >
           <input type="number" id="input-penalty-factor" step="0.1" value="2" />
-
+          <div class="form-inline">
+            <input type="checkbox" id="input-enable-input-relation">
+            <label for="input-enable-input-relation" data-i18n="label.enable_input_relation">Enable relation input</label>
+          </div>
           <div class="modal-actions">
             <button
               id="btn-advanced-close"

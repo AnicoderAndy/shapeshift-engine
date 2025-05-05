@@ -11,7 +11,8 @@
         "learning_rate": "Learning Rate:",
         "max_iteration": "Max. Iteration:",
         "penalty_factor": "Penalty Increase Factor:",
-        "main_polygon": "Main Polygon:"
+        "main_polygon": "Main Polygon:",
+        "enable_input_relation": "Enable relation input"
     },
     "text": {
         "or": "or",
