@@ -98,6 +98,13 @@ export class polygonGraphics {
         return /**@type {Text} */ (this._textObject);
     }
 
+    /**
+     * @returns {string} The text string of this.
+     */
+    getTextString() {
+        return /**@type {string} */ (this._polygon._text?.textString);
+    }
+
     destroy() {
         if (this._graphics) {
             this._graphics.destroy();

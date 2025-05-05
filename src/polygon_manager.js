@@ -4,6 +4,7 @@ import { Application, Graphics, Text } from 'pixi.js';
 import { polygonGraphics } from './polygon_graphics';
 import { beginOptimization } from './diff_func';
 import { getMsg } from './i18n';
+import { loadRelationFromJSON } from './relation_editor';
 
 /**
  * @typedef {Object} Relation
@@ -417,15 +418,7 @@ export class polygonManager {
         /**@type {{ polygons: Polygon[], relations: Relation}} */
         const data = JSON.parse(json);
         this._polyGraphicsList = [];
-        this._relationInput.notOverlapInput.value = JSON.stringify(
-            data.relations.notOverlap
-        );
-        this._relationInput.overlapInput.value = JSON.stringify(
-            data.relations.overlap
-        );
-        this._relationInput.fixInput.value = JSON.stringify(
-            data.relations.fixed
-        );
+
         this.clearCurrentPolygon();
         this._param = [];
         this._totParameter = 0;
@@ -450,6 +443,7 @@ export class polygonManager {
                 );
             }
         }
+        loadRelationFromJSON(data.polygons.length, data.relations);
     }
 
     exportToJson() {

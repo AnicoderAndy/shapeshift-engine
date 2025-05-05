@@ -37,11 +37,7 @@
         </button>
         <hr class="controls" />
         <label for="input-text" data-i18n="label.enter_text">Enter Text:</label>
-        <input
-          type="text"
-          id="input-text"
-          class="input-control"
-        />
+        <input type="text" id="input-text" class="input-control" />
         <label for="input-font-size" data-i18n="label.font_size"
           >Font size:</label
         >
@@ -86,29 +82,37 @@
           <ul id="list-polygons" class="collapsible-content"></ul>
         </div>
         <hr class="controls" />
-        <label for="input-not-overlap" data-i18n="label.not_overlap"
-          >Do not overlap:</label
+        <button
+          id="btn-relation-modal"
+          class="btn-control"
         >
-        <input
-          type="text"
-          id="input-not-overlap"
-          placeholder="[[0, 1], [1, 2]]"
-          class="input-control"
-        />
-        <label for="input-overlap" data-i18n="label.overlap">Overlap:</label>
-        <input
-          type="text"
-          id="input-overlap"
-          placeholder="[[0, 1], [1, 2]]"
-          class="input-control"
-        />
-        <label for="input-fix" data-i18n="label.fix">Fix:</label>
-        <input
-          type="text"
-          id="input-fix"
-          placeholder="[0, 1, 2]"
-          class="input-control"
-        />
+          Polygon Relation Editor
+        </button>
+        <div hidden>
+          <label for="input-not-overlap" data-i18n="label.not_overlap"
+            >Do not overlap:</label
+          >
+          <input
+            type="text"
+            id="input-not-overlap"
+            placeholder="[[0, 1], [1, 2]]"
+            class="input-control"
+          />
+          <label for="input-overlap" data-i18n="label.overlap">Overlap:</label>
+          <input
+            type="text"
+            id="input-overlap"
+            placeholder="[[0, 1], [1, 2]]"
+            class="input-control"
+          />
+          <label for="input-fix" data-i18n="label.fix">Fix:</label>
+          <input
+            type="text"
+            id="input-fix"
+            placeholder="[0, 1, 2]"
+            class="input-control"
+          />
+        </div>
         <hr class="controls" />
         <button id="btn-process" class="btn-control" data-i18n="btn.process">
           Process
@@ -148,7 +152,7 @@
         >
           Advanced Settings
         </button>
-        <button id="btn-debug" class="btn-control" hidden>Debug</button>
+        <button id="btn-debug" class="btn-control" >Debug</button>
       </div>
       <!-- Modal Advanced Settings -->
       <div id="modal-advanced" class="modal-overlay">
@@ -176,6 +180,41 @@
           <div class="modal-actions">
             <button
               id="btn-advanced-close"
+              class="btn-control"
+              data-i18n="btn.close"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Modal relation -->
+      <div id="modal-relation" class="modal-overlay">
+        <div class="modal">
+          <h2>Polygon Relation Editor</h2>
+          <div class="relation-body">
+            <div id="log-messages" class="relation-log"></div>
+            <div class="relation-controls">
+              <label for="slct-main-poly">Main Polygon:</label>
+              <select id="slct-main-poly"></select>
+              <div class="modal-actions">
+                <button class="btn-control" id="btn-relation-slct-all">Select All</button>
+                <button class="btn-control" id="btn-relation-rvrs-slct">Reverse Selection</button>
+              </div>
+              <div class="poly-list" id="relation-poly-list"></div>
+              <div class="long-actions">
+                <button class="btn-control" id="btn-mutual-not-overlap">Make selected polygons not overlap with each other</button>
+                <button class="btn-control" id="btn-mutual-overlap">Make selected polygons overlap with each other</button>
+                <button class="btn-control" id="btn-main-not-overlap">Make selected polygons not overlap with Main Polygon</button>
+                <button class="btn-control" id="btn-main-overlap">Make selected polygons overlap with Main Polygon</button>
+                <button class="btn-control" id="btn-fixed">Make selected polygons fixed</button>
+                <button class="btn-control" id="btn-clear-relation">Clear all relations</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button
+              id="btn-relation-close"
               class="btn-control"
               data-i18n="btn.close"
             >

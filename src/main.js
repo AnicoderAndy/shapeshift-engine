@@ -1,7 +1,8 @@
-import { Application, Text } from 'pixi.js';
+import { Application } from 'pixi.js';
 import { polygonManager } from './polygon_manager.js';
 import { polygon2svg } from './polygon2svg.js';
 import { getMsg, switchLang } from './i18n.js';
+import { setupRelationEditor } from './relation_editor.js';
 
 (async () => {
     // Get polygon list element
@@ -73,6 +74,7 @@ import { getMsg, switchLang } from './i18n.js';
         'click',
         polyManager.newTextHandler.bind(polyManager)
     );
+
     processBtn.addEventListener('click', async (e) => {
         const btn = e.target;
         if (btn.disabled) return;
@@ -195,6 +197,8 @@ import { getMsg, switchLang } from './i18n.js';
         uiPolyList.classList.toggle('hidden', isCollapsed);
         toggleHeader.classList.toggle('hidden', isCollapsed);
     });
+
+    setupRelationEditor(polyManager);
 
     advancedModalSwitch.addEventListener('click', () => {
         advancedModal.style.display = 'flex';

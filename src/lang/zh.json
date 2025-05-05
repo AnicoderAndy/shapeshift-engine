@@ -23,7 +23,7 @@
         "new_text": "新增文本",
         "import_text_list": "导入文本列表",
         "process": "执行",
-        "processing": "执行中...",
+        "process_triggered": "执行中...",
         "download_svg": "下载 SVG",
         "import_json": "导入 JSON",
         "download_json": "下载 JSON",
