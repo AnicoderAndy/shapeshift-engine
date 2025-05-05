@@ -166,11 +166,7 @@ import { setupRelationEditor } from './relation_editor.js';
         const file = importJsonInput.files[0];
         if (!file) return;
 
-        if (
-            !confirm(
-                'This operation will clear the canvas and all configurations. Are you sure to proceed?'
-            )
-        ) {
+        if (!confirm(getMsg('al.import_json_clear'))) {
             importJsonInput.value = '';
             return;
         }

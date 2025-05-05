@@ -52,7 +52,8 @@
         "import_json_error_caught": "An error occurred during importing JSON.\nPlease check the console for more details.",
         "draw_not_enought_vertices": "A polygon must have at least 2 vertices.",
         "draw_not_simple": "The polygon is not simple (edges intersect). Please redraw.",
-        "text_empty": "Please enter your text first."
+        "text_empty": "Please enter your text first.",
+        "import_json_clear": "This operation will clear the canvas and all configurations. Are you sure to proceed?"
     },
     "lg": {
         "relation_overwritten": "Warning: A relation bewtween the following indices is overwritten:",
