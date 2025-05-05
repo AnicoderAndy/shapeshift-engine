@@ -195,7 +195,7 @@ input[type='color'] {
 }
 
 .modal .poly-list {
-    max-height: 400px;
+    max-height: 10vh;
     min-height: 100px;
     overflow-y: auto;
     margin: 10px 0;
@@ -225,7 +225,7 @@ input[type='color'] {
     border: black 1px solid;
     margin-right: 30px;
     max-width: 100%;
-    max-height: 90vh;
+    max-height: 60vh;
     overflow: auto;
     font-family: Arial, Helvetica, sans-serif;
 }
